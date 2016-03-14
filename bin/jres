@@ -1,0 +1,8 @@
+#!/usr/bin/env node
+
+try{
+        require('../index.js').run( process.argv );
+}catch(e){
+        console.log("[error]:"+e)
+        process.exit(1)
+}

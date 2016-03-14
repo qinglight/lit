@@ -1,0 +1,18 @@
+{
+	"command":"server [command]",
+	"usage":"[command]",
+	"description":"内置的静态资源的web服务器",
+	"option":[
+		{
+			"op":"-p --port <port>",
+			"desc":"指定web启动的端口，默认为3000",
+			"type":"String",
+			"key":"port"
+		},{
+			"op":"-r --root [root]",
+			"desc":"point the root",
+			"type":"String",
+			"key":"root"
+		}
+	]
+}

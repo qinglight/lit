@@ -1,0 +1,69 @@
+{
+  "name": "jresplus",
+  "version": "0.3.24",
+  "description": "恒生移动web应用平台（Light）快速开发集成工具箱",
+  "main": "index.js",
+  "dependencies": {
+    "bluebird": "^3.3.4",
+    "colors": "^1.0.3",
+    "commander": "^2.6.0",
+    "fis-scaffold-kernel": "^0.1.1",
+    "fs-utils": "^0.7.0",
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-connect": "^3.1.0",
+    "gulp-filter": "^4.0.0",
+    "gulp-load-plugins": "^1.2.0",
+    "gulp-minify-css": "^1.2.4",
+    "gulp-resources": "^0.3.0",
+    "gulp-rev": "^7.0.0",
+    "gulp-rev-replace": "^0.4.3",
+    "gulp-uglify": "^1.5.3",
+    "gulp-useref": "^3.0.7",
+    "gulp-util": "^3.0.7",
+    "gulp-zip": "^3.2.0",
+    "htmldom": "git+https://github.com/hs-light/htmldom.git",
+    "lodash": "^2.4.1",
+    "log4js": "^0.6.22",
+    "open": "0.0.5",
+    "rimraf": "^2.5.2",
+    "run-sequence": "^1.1.5",
+    "scaffold": "^0.2.5",
+    "through2": "^2.0.1"
+  },
+  "bin": {
+    "jres": "bin/jres",
+    "jresplus": "bin/jres",
+    "light": "bin/jres"
+  },
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "preferGlobal": true,
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "light.hs.net",
+  "license": "ISC",
+  "keywords": [
+    "jresplus",
+    "mobile",
+    "web",
+    "weixin",
+    "tool",
+    "hundusn",
+    "javascript",
+    "devlope"
+  ],
+  "maintainers": [
+    {
+      "name": "cuckoo007",
+      "email": "jingjing.xie@hotmail.com"
+    },
+    {
+      "name": "wangyb10555",
+      "email": "wangyb10555@hundsun.com"
+    }
+  ]
+}
