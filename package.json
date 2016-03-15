@@ -1,6 +1,6 @@
 {
-  "name": "jresplus",
-  "version": "0.3.24",
+  "name": "lighting",
+  "version": "1.0.1-20160315",
   "description": "恒生移动web应用平台（Light）快速开发集成工具箱",
   "main": "index.js",
   "dependencies": {
@@ -32,8 +32,6 @@
     "through2": "^2.0.1"
   },
   "bin": {
-    "jres": "bin/jres",
-    "jresplus": "bin/jres",
     "light": "bin/jres"
   },
   "engines": {
@@ -47,7 +45,6 @@
   "author": "light.hs.net",
   "license": "ISC",
   "keywords": [
-    "jresplus",
     "mobile",
     "web",
     "weixin",
@@ -55,15 +52,5 @@
     "hundusn",
     "javascript",
     "devlope"
-  ],
-  "maintainers": [
-    {
-      "name": "cuckoo007",
-      "email": "jingjing.xie@hotmail.com"
-    },
-    {
-      "name": "wangyb10555",
-      "email": "wangyb10555@hundsun.com"
-    }
   ]
 }
