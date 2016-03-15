@@ -12,24 +12,51 @@ var $ = require('gulp-load-plugins')();
 app = {
   pages:"src/html/page/*.html",
   dist:"dist"
-}
+} 
 
 gulp.task('clean:dist', function (cb) {
-  return rimraf(app.dist, cb);
+  rimraf(app.dist, cb);
 });
 
+//project.js中预定义的代码合并
+//**************************************************************
+var jobsInProject = [];
+for(var key in project.release){
+  var data = project.release[key];
+  var data_buffer = [];
+  _.forEach(data,function(d){
+    data_buffer.push("dist/"+d);
+  });
+  gulp.task(key,function(){
+    return gulp.src(data_buffer)
+      .pipe($.concat(key))
+      .pipe(gulp.dest(app.dist))
+  });
+  jobsInProject.push(key);
+}
+//***************************************************************
+
 gulp.task('resources',function(){
-  return gulp.src(['src/**','!src/html/**'])
+  return gulp.src(['src/**','!src/html/**','!src/template/**'])
     .pipe(gulp.dest(app.dist))
 });
 
-gulp.task('release:dev',['resources'],function () {
+gulp.task('template',function(){
+  return gulp.src(['src/template/**'])
+    .pipe(require("../tools/template")())
+    .pipe($.uglify())
+    .pipe(gulp.dest(app.dist+"/template"))
+});
+
+gulp.task('release:dev',function () {
+  runSequence(['resources','template'],jobsInProject);
   return gulp.src(app.pages)
     .pipe(require("../tools/assemble")({views:"src/html/view",snippets:"src/html/snippet",beautify:true}))
     .pipe(gulp.dest(app.dist))
 });
 
-gulp.task('release:product',['resources'],function () {
+
+gulp.task('release:product',['resources','template'],function () {
   var jsFilter = $.filter('**/*.js');
   var cssFilter = $.filter('**/*.css');
 

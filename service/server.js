@@ -15,8 +15,6 @@ exports.do = function(cmd,options) {
       livereload: false,
       port: options.port
     });
-
-    require('open')("http://localhost:"+options.port);
   });
 
   require('run-sequence')('server');
