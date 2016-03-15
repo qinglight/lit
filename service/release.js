@@ -18,41 +18,18 @@ gulp.task('clean:dist', function (cb) {
   return rimraf(app.dist, cb);
 });
 
-//预处理
-//
-function processRelaseInProject(){
-  var release_in_json = project.release;
-  var streams = [];
-  for(var key in release_in_json){
-    var stream = gulp.src(release_in_json[key])
-      .pipe($.concat(key));
-    streams.push(stream)
-  }
-  return streams;
-}
-
-gulp.task('resources:css',function(){
-  return gulp.src(['src/css/**'])
-    .pipe(gulp.dest(app.dist+"/css"))
-})
-
-gulp.task('resources:js',function(){
-  return gulp.src(['src/js/**'])
-    .pipe(gulp.dest(app.dist+"/js"))
-})
-
-gulp.task('resources:extra',function(){
+gulp.task('resources',function(){
   return gulp.src(['src/**','!src/html/**'])
     .pipe(gulp.dest(app.dist))
-})
+});
 
-gulp.task('release:dev',['resources:css'],function () {
+gulp.task('release:dev',['resources'],function () {
   return gulp.src(app.pages)
     .pipe(require("../tools/assemble")({views:"src/html/view",snippets:"src/html/snippet",beautify:true}))
     .pipe(gulp.dest(app.dist))
 });
 
-gulp.task('release:product',['resources:css'],function () {
+gulp.task('release:product',['resources'],function () {
   var jsFilter = $.filter('**/*.js');
   var cssFilter = $.filter('**/*.css');
 
