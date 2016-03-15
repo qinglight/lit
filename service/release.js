@@ -18,51 +18,27 @@ gulp.task('clean:dist', function (cb) {
   rimraf(app.dist, cb);
 });
 
-//project.js中预定义的代码合并
-//**************************************************************
-var jobsInProject = [];
-for(var key in project.release){
-  var data = project.release[key];
-  var data_buffer = [];
-  _.forEach(data,function(d){
-    data_buffer.push("dist/"+d);
-  });
-  gulp.task(key,function(){
-    return gulp.src(data_buffer)
-      .pipe($.concat(key))
-      .pipe(gulp.dest(app.dist))
-  });
-  jobsInProject.push(key);
-}
-//***************************************************************
-
 gulp.task('resources',function(){
-  return gulp.src(['src/**','!src/html/**','!src/template/**'])
+  return gulp.src(['src/**','!src/html/**','!src/js/**','!src/css/**'])
     .pipe(gulp.dest(app.dist))
 });
 
-gulp.task('template',function(){
-  return gulp.src(['src/template/**'])
-    .pipe(require("../tools/template")())
-    .pipe($.uglify())
-    .pipe(gulp.dest(app.dist+"/template"))
-});
 
-gulp.task('release:dev',function () {
-  runSequence(['resources','template'],jobsInProject);
+gulp.task('release:dev',['resources'],function () {
   return gulp.src(app.pages)
     .pipe(require("../tools/assemble")({views:"src/html/view",snippets:"src/html/snippet",beautify:true}))
+    .pipe($.useref({searchPath: ['src']}))
     .pipe(gulp.dest(app.dist))
 });
 
 
-gulp.task('release:product',['resources','template'],function () {
+gulp.task('release:product',['resources'],function () {
   var jsFilter = $.filter('**/*.js');
   var cssFilter = $.filter('**/*.css');
 
   return gulp.src(app.pages)
     .pipe(require("../tools/assemble")({views:"src/html/view",snippets:"src/html/snippet",beautify:true}))
-    .pipe($.useref({searchPath: [app.dist,'src']}))
+    .pipe($.useref({searchPath: ['src']}))
     .pipe(jsFilter)
     .pipe($.uglify())
     .pipe(jsFilter.restore())
@@ -118,8 +94,17 @@ exports.do = function(cmd,options) {
       require('open')("http://localhost:3000");
     });
 
-    tasks.push('brower');
+    runSequence(brower);
   }
 
+  if(options.watch){
+    var watcher = gulp.watch(['src/**/*'], function(){
+      runSequence.apply(null,tasks);
+    });
+    watcher.on('change', function(event) {
+      console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
+    });
+  }
+  
   runSequence.apply(null,tasks);
 }
