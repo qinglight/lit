@@ -26,6 +26,9 @@ function assemble(options) {
          html.$(template).remove();
       })
 
+      var filename = file.path.split("/").pop().split("\.")[0];
+      html.$("script[src]").eq(-1).after('<script type="text/javascript" src="js/regist/'+filename+'.js"></script>');
+
       _.forEach(views,function(view){
         var attrs = view.attributes;
         var viewCode = _.readFileSync(options.views+"/"+attrs.id+".html").toString()

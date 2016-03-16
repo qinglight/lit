@@ -51,7 +51,7 @@ gulp.task('release:dev',['resources','template'],function () {
     .pipe($.useref({searchPath: ['src',app.template],noconcat:true,root:process.cwd()+"/src"}))
     .pipe(cssFilter)
     .pipe($.less())
-    .pipe(lessFilter.restore())
+    .pipe(cssFilter.restore())
     .pipe(gulp.dest(app.dist))
 });
 
