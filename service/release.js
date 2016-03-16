@@ -24,7 +24,7 @@ gulp.task('clean:dist', function (cb) {
 });
 
 gulp.task('resources',function(){
-  var resources = ['src/**','!src/html/**','!src/js/**','!src/css/*.css','!src/css/*.less','!src/template/**'];
+  var resources = ['src/**','!src/html/**','!src/js/**','!src/css/*.css','!src/template/**'];
   if(project.ignore){
     _.forEach(project.ignore,function(ignore){
       resources.push("!src/"+ignore);
@@ -43,21 +43,19 @@ gulp.task('template',function(){
     .pipe(gulp.dest(app.template))
 });
 
-var lessFilter = $.filter('**/*.less');
+var jsFilter = $.filter('**/*.js');
+var cssFilter = $.filter('**/*.css');
 gulp.task('release:dev',['resources','template'],function () {
   return gulp.src(app.pages)
     .pipe(require("../tools/assemble")({views:"src/html/view",snippets:"src/html/snippet",beautify:true}))
     .pipe($.useref({searchPath: ['src',app.template],noconcat:true,root:process.cwd()+"/src"}))
-    .pipe(lessFilter)
+    .pipe(cssFilter)
     .pipe($.less())
     .pipe(lessFilter.restore())
     .pipe(gulp.dest(app.dist))
 });
 
 gulp.task('release:product',['resources','template'],function () {
-  var jsFilter = $.filter('**/*.js');
-  var cssFilter = $.filter('**/*.css');
-
   return gulp.src(app.pages)
     .pipe(require("../tools/assemble")({views:"src/html/view",snippets:"src/html/snippet",beautify:true}))
     .pipe($.useref({searchPath: ['src',app.template]}))
@@ -66,6 +64,7 @@ gulp.task('release:product',['resources','template'],function () {
     .pipe($.rev())
     .pipe(jsFilter.restore())
     .pipe(cssFilter)
+    .pipe($.less())
     .pipe($.minifyCss({cache: true}))
     .pipe($.rev())
     .pipe(cssFilter.restore())
