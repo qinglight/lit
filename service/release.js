@@ -24,7 +24,16 @@ gulp.task('clean:dist', function (cb) {
 });
 
 gulp.task('resources',function(){
-  return gulp.src(['src/**','!src/html/**','!src/js/**','!src/css/*.css','!src/template/**'])
+  var resources = ['src/**','!src/html/**','!src/js/**','!src/css/*.css','!src/template/**'];
+  if(project.ignore){
+    _.forEach(project.ignore,function(ignore){
+      resources.push("!src/"+ignore);
+      if(ignore.endsWith("/")){
+        resources.push("!src/"+ignore+"/**");
+      }
+    })
+  }
+  return gulp.src(resources)
     .pipe(gulp.dest(app.dist))
 });
 
