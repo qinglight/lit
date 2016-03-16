@@ -114,7 +114,7 @@ exports.do = function(cmd,options) {
   }
 
   if(options.brower){
-     _.log("打开浏览器,开启服务监听");
+    _.log("打开浏览器,开启服务监听");
     gulp.task('brower',function () {
       $.connect.server({
         root: ['dist'],
@@ -125,7 +125,7 @@ exports.do = function(cmd,options) {
       require('open')("http://localhost:3000");
     });
 
-    runSequence(brower);
+    runSequence('brower');
   }
 
   tasks.push('clean:template');
