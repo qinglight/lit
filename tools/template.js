@@ -16,6 +16,7 @@ function template(options) {
     if (file.isBuffer()) {
       var name = file.path.split("/").pop().split("\.")[0];
       file.contents = new Buffer("App."+name+"Template="+_.template(file.contents).source);
+      file.path = file.path.replace(/tpl$/i,"js");
     }
     if (file.isStream()) {
       return cb(null, file);

@@ -11,43 +11,52 @@ var $ = require('gulp-load-plugins')();
 
 app = {
   pages:"src/html/page/*.html",
-  dist:"dist"
+  dist:"dist",
+  template:"src/template"
 } 
+
+gulp.task('clean:template', function (cb) {
+  rimraf(app.template+"/*.js", cb);
+});
 
 gulp.task('clean:dist', function (cb) {
   rimraf(app.dist, cb);
 });
 
 gulp.task('resources',function(){
-  return gulp.src(['src/**','!src/html/**','!src/js/**','!src/css/**'])
+  return gulp.src(['src/**','!src/html/**','!src/js/**','!src/css/*.css','!src/template/**'])
     .pipe(gulp.dest(app.dist))
 });
 
+gulp.task('template',function(){
+  return gulp.src([app.template+'/*.tpl'])
+    .pipe(require("../tools/template")())
+    .pipe(gulp.dest(app.template))
+});
 
-gulp.task('release:dev',['resources'],function () {
+gulp.task('release:dev',['resources','template'],function () {
   return gulp.src(app.pages)
     .pipe(require("../tools/assemble")({views:"src/html/view",snippets:"src/html/snippet",beautify:true}))
-    .pipe($.useref({searchPath: ['src']}))
+    .pipe($.useref({searchPath: ['src',app.template],noconcat:true,root:process.cwd()+"/src"}))
     .pipe(gulp.dest(app.dist))
 });
 
-
-gulp.task('release:product',['resources'],function () {
+gulp.task('release:product',['resources','template'],function () {
   var jsFilter = $.filter('**/*.js');
   var cssFilter = $.filter('**/*.css');
 
   return gulp.src(app.pages)
     .pipe(require("../tools/assemble")({views:"src/html/view",snippets:"src/html/snippet",beautify:true}))
-    .pipe($.useref({searchPath: ['src']}))
+    .pipe($.useref({searchPath: ['src',app.template]}))
     .pipe(jsFilter)
     .pipe($.uglify())
+    .pipe($.rev())
     .pipe(jsFilter.restore())
     .pipe(cssFilter)
     .pipe($.minifyCss({cache: true}))
-    .pipe(cssFilter.restore())
     .pipe($.rev())
+    .pipe(cssFilter.restore())
     .pipe($.revReplace())
-
     .pipe(gulp.dest(app.dist))
 });
 
@@ -96,6 +105,8 @@ exports.do = function(cmd,options) {
 
     runSequence(brower);
   }
+
+  tasks.push('clean:template');
 
   if(options.watch){
     var watcher = gulp.watch(['src/**/*'], function(){
