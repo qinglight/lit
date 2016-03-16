@@ -14,18 +14,7 @@ function resource(options) {
       return cb(null, file);
     }
     if (file.isBuffer()) {
-      var html = new HtmlDom(file.contents);
-      var scripts = html.$("script");
-      var styles = html.$("link[rel=stylesheet]");
-
-      _.forEach(scripts,function(script){
-        that.push(new gutil.File({
-          base: '/mnt/d/LIGHT/Sources/h5_apps/light_quote_sh/src/css/',
-          cwd: '/mnt/d/LIGHT/Sources/h5_apps/light_quote_sh/',
-          path: 'css/style.css',
-          contents:new Buffer("123123")
-        }));
-      })
+      
     }
     if (file.isStream()) {
       return cb(null, file);
