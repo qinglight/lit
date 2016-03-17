@@ -1,15 +1,19 @@
-var jres = require('./kernel'),
-	pkg = jres.about;
+var light = require('./kernel');
+var art = require('ascii-art');
 	
 require('colors')
 function version(){
 	console.log()
-	console.log("========= v"+pkg.version+" =========");
+	console.log("v"+require("./package.json").version);
+	console.log()
+	art.font('lighting', 'Doom', function(rendered){
+	    console.log(art.style(rendered, ''));
+	});
 }
 
 function help(){
 	console.log()
-	console.log('useage:'+'light'.yellow+' <command> OR '+'jres/jresplus'.yellow+' <command>');
+	console.log('useage:'+'light'.yellow+' <command> ');
 	console.log()
 	console.log('commands:'.green);
 	console.log('  create\tcreate the project');
@@ -19,18 +23,25 @@ function help(){
 
 	console.log()
 	console.log('please use "light <command> -h" to check the help info;');
+	art.font('lighting', 'Doom', function(rendered){
+	    console.log(art.style(rendered, ''));
+	});
 }
 function main(argv){
 
 	var cmdArg=argv[2];
+
+	if(!cmdArg){
+		cmdArg = '-h';
+	}
 
 	if(cmdArg === '-v' || cmdArg=== '--version'){
 		version();
 	}else if(cmdArg === '-h' || cmdArg=== '--help'){
 		help();
 	}else{
-		jres.require('command',cmdArg);
-		jres.commander.parse(argv);
+		light.require('command',cmdArg);
+		light.commander.parse(argv);
 	}
 }
 
