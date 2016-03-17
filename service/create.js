@@ -2,6 +2,13 @@ var jres = require('../kernel'),
 		_ = jres.util,
 		path = require('path');
 
+
+var types = {
+  blank:"scaffold",
+  angular:"scaffold-angularjs",
+  demo:"master"
+}
+
 exports.do = function(directory,options){
 	directory = directory || ".";
 	
@@ -107,11 +114,7 @@ exports.do = function(directory,options){
       }
 
       function initProject(){
-        var branch  = "scaffold";
-        
-        if(options.type=="demo"){
-          branch = "master";
-        }
+        var branch  = types[options.type||'blank'];
 
         scaffold.download('wyub/light-dev-demo@'+branch, function (err, temp_path) {
           
