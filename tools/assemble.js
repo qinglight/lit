@@ -26,19 +26,21 @@ function assemble(options) {
          html.$(template).remove();
       })
 
-      var filename = file.path.split("/").pop().split("\.")[0];
-      html.$("script[src]").eq(-1).after('<script type="text/javascript" src="js/regist/'+filename+'.js"></script>');
+      if(views.length>0){
+        var filename = file.path.split("/").pop().split("\.")[0];
+        html.$("script[src]").eq(-1).after('<script type="text/javascript" src="js/regist/'+filename+'.js"></script>');
 
-      _.forEach(views,function(view){
-        var attrs = view.attributes;
-        var viewCode = _.readFileSync(options.views+"/"+attrs.id+".html").toString()
+        _.forEach(views,function(view){
+          var attrs = view.attributes;
+          var viewCode = _.readFileSync(options.views+"/"+attrs.id+".html").toString()
 
-        html.$(view).after(viewCode);
-        html.$(view).remove();
+          html.$(view).after(viewCode);
+          html.$(view).remove();
 
-        //引入js资源
-        html.$("script[src]").eq(-1).after('<script type="text/javascript" src="js/view/'+attrs.id+'.js"></script>');
-      });
+          //引入js资源
+          html.$("script[src]").eq(-1).after('<script type="text/javascript" src="js/view/'+attrs.id+'.js"></script>');
+        });
+      }
 
       _.forEach(snippets,function(snippet){
         var attrs = snippet.attributes;
