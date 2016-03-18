@@ -6,7 +6,8 @@ var jres = require('../kernel'),
 var types = {
   blank:"scaffold",
   angular:"scaffold-angularjs",
-  demo:"master"
+  demo:"master",
+  f7:"scaffold-f7"
 }
 
 exports.do = function(directory,options){
