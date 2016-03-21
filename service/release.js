@@ -8,9 +8,9 @@ var runSequence = require('run-sequence').use(gulp);
 var $ = require('gulp-load-plugins')();
 
 app = {
-  dist:process.cwd()+"/dist",
-  src:process.cwd()+"/src",
-  tmp:process.cwd()+"/.tmp"
+  dist:"dist",
+  src:"src",
+  tmp:".tmp"
 }
 
 //--------------清除------------------------
@@ -26,7 +26,7 @@ gulp.task('clean:dist', function (cb) {
 //-----------------------------------------
 
 //-------------资源准备---------------------
-gulp.task('resources',['clean:dist','clean:tmp'],function(){
+gulp.task('resources',function(){
   _.log("资源输出dist目录");
 
   project.ignore = project.ignore || [];
@@ -34,7 +34,7 @@ gulp.task('resources',['clean:dist','clean:tmp'],function(){
   var ignore = [];
 
   _.forEach(_ignore,function(value){
-    ignore.push(app.src+"/"+value);
+    ignore.push(process.cwd()+"/"+app.src+"/"+value);
   });
 
   return gulp.src("**/*",{cwd:app.src,ignore:ignore,nodir:true})
@@ -70,22 +70,6 @@ gulp.task('html',['jade'],function(){
 });
 //-----------------------------------------
 
-//-------------资源集成---------------------
-gulp.task('release',['resources','template','html','less'],function () {
-  _.log("准备资源处理...");
-  var jsFilter = $.filter('**/*.js');
-  var cssFilter = $.filter('**/*.css');
-  return gulp.src([".tmp/*.html"])
-    .pipe(require("../tools/assemble")())
-    .pipe(require("../tools/useref")({searchPath: [app.src,app.tmp],noconcat:!options.concat}))
-    .pipe($.if(options.uglify),[jsFilter,$.uglify(),jsFilter.restore()])
-    .pipe($.if(options.uglify),[cssFilter,$.minifyCss({cache: true}),cssFilter.restore()])
-    .pipe($.if(options.suffix),[$.rev(),$.revReplace()])
-    .pipe(gulp.dest(app.dist))
-});
-//-----------------------------------------
-
-
 //-------------extra-----------------------
 gulp.task('pack',function () {
   _.log("打包资源为发布包");
@@ -105,7 +89,25 @@ gulp.task('brower',function () {
 });
 //-----------------------------------------
 exports.do = function(cmd,options) {
-  var tasks = ['release'];
+
+  //-------------资源集成---------------------
+  gulp.task('release',['resources','template','html','less'],function () {
+    _.log("准备资源处理...");
+    var jsFilter = $.filter('**/*.js');
+    var cssFilter = $.filter('**/*.css');
+    return gulp.src([app.tmp+"/*.html"])
+      .pipe(require("../tools/assemble")())
+      .pipe(require("../tools/useref")({searchPath: [app.src,app.tmp],noconcat:true}))
+      // .pipe($.if(function(file){
+      //   // console.log(arguments)
+      //   // options.uglify
+      // },$.uglify()))
+      .pipe($.if(options.uglify,$.minifyCss({cache: true})))
+      .pipe($.if(options.suffix,$.rev(),$.revReplace()))
+      .pipe(gulp.dest(app.dist))
+  });
+  //-----------------------------------------
+  var tasks = ['clean:dist','release'];
 
   if(options.pack){
     tasks.push('pack');

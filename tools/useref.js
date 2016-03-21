@@ -9,7 +9,7 @@ var gulpif = require('gulp-if');
 
 const PLUGIN_NAME = 'gulp-light-useref';
 
-function template(options) {
+function _useref(options) {
   var searchPath = options.searchPath;
 
   return through.obj(function(file, enc, cb) {
@@ -24,12 +24,12 @@ function template(options) {
         files = files.assets;
         var pattern = "{"+searchPath.join(",")+"}/"+"{"+files.join(",")+"}";
         var src = vfs.src(pattern)
-
         src
           .pipe(gulpif(!options.noconcat, concat(name)))
           .pipe(through.obj(function (newFile, encoding, callback) {
-              self.push(newFile);
-              // console.log(new File())
+              newFile.base="/tmp/aaa/src"
+              console.log(newFile)
+              that.push(newFile);
               callback();
           }));
       })
@@ -37,4 +37,4 @@ function template(options) {
   });
 }
 
-module.exports = template;
+module.exports = _useref;
