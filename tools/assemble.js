@@ -3,6 +3,7 @@ var gutil = require('gulp-util');
 var PluginError = gutil.PluginError;
 var HtmlDom = require('htmldom');
 var _ = require('../kernel').util;
+var jade = require("jade");
 
 const PLUGIN_NAME = 'gulp-light-assemble';
 
@@ -32,7 +33,16 @@ function assemble(options) {
 
         _.forEach(views,function(view){
           var attrs = view.attributes;
-          var viewCode = _.readFileSync(options.views+"/"+attrs.id+".html").toString()
+          var viewCode = "";
+          var filebase = options.views+"/"+attrs.id+".";
+          if(_.exists(filebase+"html")){
+            viewCode = _.readFileSync(filebase+"jade").toString()
+            viewCode = jade.compile(viewCode)();
+          }else if(_.exists(filebase+"jade")){
+            viewCode = re
+          }else{
+            _.log("视图"+attrs.id+"不存在!");
+          }
 
           html.$(view).after(viewCode);
           html.$(view).remove();
@@ -44,7 +54,17 @@ function assemble(options) {
 
       _.forEach(snippets,function(snippet){
         var attrs = snippet.attributes;
-        var snippetCode = _.readFileSync(options.snippets+"/"+attrs.id+".html").toString()
+
+        var snippetCode = "";
+        var filebase = options.snippets+"/"+attrs.id+".";
+        if(_.exists(filebase+"html")){
+          snippetCode = _.readFileSync(filebase+"html").toString()
+        }else if(_.exists(filebase+"jade")){
+          snippetCode = _.readFileSync(filebase+"jade").toString();
+          snippetCode = jade.compile(snippetCode)();
+        }else{
+          _.log("代码片段"+attrs.id+"不存在!");
+        }
 
         html.$(snippet).after(snippetCode);
         html.$(snippet).remove();

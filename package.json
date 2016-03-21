@@ -24,10 +24,10 @@
     "gulp-util": "^3.0.7",
     "gulp-zip": "^3.2.0",
     "htmldom": "https://github.com/hs-light/htmldom/tarball/master",
-    "lodash": "^2.4.1",
+    "jade": "^1.11.0",
+    "lodash": "^4.6.1",
     "log4js": "^0.6.22",
     "open": "0.0.5",
-    "rimraf": "^2.5.2",
     "run-sequence": "^1.1.5",
     "scaffold": "^0.2.5",
     "through2": "^2.0.1"

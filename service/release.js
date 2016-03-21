@@ -1,42 +1,38 @@
 var jres = require('../kernel'),
-  _ = jres.util;
-
-var project = require(process.cwd()+'/project.json');
+  _ = jres.util,
+  project = require(process.cwd()+'/project.json');
 
 //gulp
 var gulp = require('gulp');
-var rimraf = require('rimraf');
 var runSequence = require('run-sequence').use(gulp);
 var $ = require('gulp-load-plugins')();
 
 app = {
-  pages:"src/html/page/*.html",
   dist:"dist",
-  template:"src/template"
-} 
+  src:"src",
+  tmp:".tmp"
+}
 
-gulp.task('clean:template', function (cb) {
+//--------------清除------------------------
+gulp.task('clean:tmp', function (cb) {
   _.log("清除模板编译输出");
-  rimraf(app.template+"/*.js", cb);
+  _.del(app.tmp,cb);
 });
 
 gulp.task('clean:dist', function (cb) {
   _.log("清除目标(dist)目录");
-  rimraf(app.dist, cb);
+  _.del(app.dist,cb);
 });
+//-----------------------------------------
 
+
+//-------------资源准备---------------------
 gulp.task('resources',function(){
   _.log("资源输出dist目录");
-  var resources = ['src/**','!src/html/**','!src/js/**','!src/css/*.css','!src/template/**'];
-  if(project.ignore){
-    _.forEach(project.ignore,function(ignore){
-      resources.push("!src/"+ignore);
-      if(ignore.endsWith("/")){
-        resources.push("!src/"+ignore+"/**");
-      }
-    })
-  }
-  return gulp.src(resources)
+
+  project.ignore = project.ignore || [];
+  var ignore  = _.union(project.ignore,['html','js','css','template']);
+  return gulp.src("**/*",{cwd:app.src,ignore:ignore,nodir:true})
     .pipe(gulp.dest(app.dist))
 });
 
@@ -46,11 +42,11 @@ gulp.task('template',function(){
     .pipe(require("../tools/template")())
     .pipe(gulp.dest(app.template))
 });
-
+//-----------------------------------------
 
 gulp.task('release:dev',['resources','template'],function () {
   _.log("准备资源处理...");
-  var jsFilter = $.filter('**/*.js');
+  var jsFilter = $.filter('/***.js');
   var cssFilter = $.filter('**/*.css');
   return gulp.src(app.pages)
     .pipe(require("../tools/assemble")({views:"src/html/view",snippets:"src/html/snippet",beautify:true}))
@@ -82,6 +78,11 @@ gulp.task('release:product',['resources','template'],function () {
 });
 
 exports.do = function(cmd,options) {
+  runSequence("resources");
+
+  return;
+
+
   var tasks = ['clean:dist'];
 
   //优化
