@@ -27,8 +27,15 @@ function _useref(options) {
         src
           .pipe(gulpif(!options.noconcat, concat(name)))
           .pipe(through.obj(function (newFile, encoding, callback) {
-              newFile.base="/tmp/aaa/src"
-              console.log(newFile)
+              newFile.base=(function(){
+                var base = "";
+                _.forEach(searchPath,function(path){
+                  if(newFile.path.indexOf(newFile.base+path)==0){
+                    base = path;
+                  }
+                });
+                return base;
+              })();
               that.push(newFile);
               callback();
           }));

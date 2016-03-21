@@ -22,6 +22,12 @@
 			"key":"pack"
 		},
 		{
+			"op":"-s --suffix",
+			"desc":"是否添加反缓存后缀",
+			"type":"Boolean",
+			"key":"suffix"
+		},
+		{
 			"op":"-d --deploy [deploy]",
 			"desc":"部署目录，必须为绝对路径，标识服务器访问目录的位置",
 			"type":"String",

@@ -1,6 +1,7 @@
 var jres = require('../kernel'),
   _ = jres.util,
-  project = require(process.cwd()+'/project.json');
+  project = require(process.cwd()+'/project.json'),
+  lazypipe = require('lazypipe');
 
 //gulp
 var gulp = require('gulp');
@@ -88,25 +89,30 @@ gulp.task('brower',function () {
   require('open')("http://localhost:3000");
 });
 //-----------------------------------------
+
 exports.do = function(cmd,options) {
 
   //-------------资源集成---------------------
   gulp.task('release',['resources','template','html','less'],function () {
     _.log("准备资源处理...");
-    var jsFilter = $.filter('**/*.js');
-    var cssFilter = $.filter('**/*.css');
+
     return gulp.src([app.tmp+"/*.html"])
       .pipe(require("../tools/assemble")())
       .pipe(require("../tools/useref")({searchPath: [app.src,app.tmp],noconcat:true}))
-      // .pipe($.if(function(file){
-      //   // console.log(arguments)
-      //   // options.uglify
-      // },$.uglify()))
-      .pipe($.if(options.uglify,$.minifyCss({cache: true})))
-      .pipe($.if(options.suffix,$.rev(),$.revReplace()))
+      .pipe($.if(function(file){
+        return options.uglify&&file.extname&&file.extname==".js";
+      },$.uglify()))
+      .pipe($.if(function(file){
+        return options.uglify&&file.extname&&file.extname==".css";
+      },$.minifyCss({cache: true})))
+      .pipe($.if(function(file){
+        return options.suffix;
+      },$.rev()))
+      .pipe($.revReplace())
       .pipe(gulp.dest(app.dist))
   });
   //-----------------------------------------
+  
   var tasks = ['clean:dist','release'];
 
   if(options.pack){
