@@ -8,9 +8,9 @@ var runSequence = require('run-sequence').use(gulp);
 var $ = require('gulp-load-plugins')();
 
 app = {
-  dist:"dist",
-  src:"src",
-  tmp:".tmp"
+  dist:process.cwd()+"/dist",
+  src:process.cwd()+"/src",
+  tmp:process.cwd()+"/.tmp"
 }
 
 //--------------清除------------------------
@@ -25,116 +25,102 @@ gulp.task('clean:dist', function (cb) {
 });
 //-----------------------------------------
 
-
 //-------------资源准备---------------------
-gulp.task('resources',function(){
+gulp.task('resources',['clean:dist','clean:tmp'],function(){
   _.log("资源输出dist目录");
 
   project.ignore = project.ignore || [];
-  var ignore  = _.union(project.ignore,['html','js','css','template']);
+  var _ignore  = _.union(project.ignore,['html/**','js/**','css/**','template/**']);
+  var ignore = [];
+
+  _.forEach(_ignore,function(value){
+    ignore.push(app.src+"/"+value);
+  });
+
   return gulp.src("**/*",{cwd:app.src,ignore:ignore,nodir:true})
     .pipe(gulp.dest(app.dist))
 });
+//-----------------------------------------
 
+//-------------模板编译---------------------
 gulp.task('template',function(){
-  _.log("编译模板文件")
-  return gulp.src([app.template+'/*.tpl'])
+  _.log("编译js模板文件")
+  return gulp.src([app.src+'/template/*.tpl'])
     .pipe(require("../tools/template")())
-    .pipe(gulp.dest(app.template))
+    .pipe(gulp.dest(app.tmp+"/template"))
+});
+
+gulp.task('jade',function(){
+  _.log("编译视图模板文件")
+  return gulp.src([app.src+'/html/**/*.jade'])
+    .pipe($.jade())
+    .pipe(gulp.dest(app.tmp+"/html"))
+});
+
+gulp.task('less',function(){
+  _.log("编译less样式文件")
+  return gulp.src([app.src+'/css/**/*.less'])
+    .pipe($.less())
+    .pipe(gulp.dest(app.tmp+"/css"))
+});
+
+gulp.task('html',['jade'],function(){
+  return gulp.src([app.src+'/html/page/*.html',app.tmp+'/html/page/*.html'])
+    .pipe(gulp.dest(app.tmp))
 });
 //-----------------------------------------
 
-gulp.task('release:dev',['resources','template'],function () {
-  _.log("准备资源处理...");
-  var jsFilter = $.filter('/***.js');
-  var cssFilter = $.filter('**/*.css');
-  return gulp.src(app.pages)
-    .pipe(require("../tools/assemble")({views:"src/html/view",snippets:"src/html/snippet",beautify:true}))
-    .pipe($.useref({searchPath: ['src',app.template],noconcat:true,root:process.cwd()+"/src"}))
-    .pipe(cssFilter)
-    .pipe($.less())
-    .pipe(cssFilter.restore())
-    .pipe(gulp.dest(app.dist))
-});
-
-gulp.task('release:product',['resources','template'],function () {
+//-------------资源集成---------------------
+gulp.task('release',['resources','template','html','less'],function () {
   _.log("准备资源处理...");
   var jsFilter = $.filter('**/*.js');
   var cssFilter = $.filter('**/*.css');
-  return gulp.src(app.pages)
-    .pipe(require("../tools/assemble")({views:"src/html/view",snippets:"src/html/snippet",beautify:true}))
-    .pipe($.useref({searchPath: ['src',app.template]}))
-    .pipe(jsFilter)
-    .pipe($.uglify())
-    .pipe($.rev())
-    .pipe(jsFilter.restore())
-    .pipe(cssFilter)
-    .pipe($.less())
-    .pipe($.minifyCss({cache: true}))
-    .pipe($.rev())
-    .pipe(cssFilter.restore())
-    .pipe($.revReplace())
+  return gulp.src([".tmp/*.html"])
+    .pipe(require("../tools/assemble")())
+    .pipe(require("../tools/useref")({searchPath: [app.src,app.tmp],noconcat:!options.concat}))
+    .pipe($.if(options.uglify),[jsFilter,$.uglify(),jsFilter.restore()])
+    .pipe($.if(options.uglify),[cssFilter,$.minifyCss({cache: true}),cssFilter.restore()])
+    .pipe($.if(options.suffix),[$.rev(),$.revReplace()])
     .pipe(gulp.dest(app.dist))
 });
+//-----------------------------------------
 
+
+//-------------extra-----------------------
+gulp.task('pack',function () {
+  _.log("打包资源为发布包");
+  return gulp.src("dist/**")
+    .pipe($.zip(project.project+'-'+project.version+'.zip'))
+    .pipe(gulp.dest('.'));
+});
+
+gulp.task('brower',function () {
+  _.log("打开浏览器,开启服务监听");
+  $.connect.server({
+    root: ['dist'],
+    livereload: true,
+    port: 3000
+  });
+  require('open')("http://localhost:3000");
+});
+//-----------------------------------------
 exports.do = function(cmd,options) {
-  runSequence("resources");
+  var tasks = ['release'];
 
-  return;
-
-
-  var tasks = ['clean:dist'];
-
-  //优化
-  if(options.uglify){
-    tasks.push('release:product');
-  }else{
-    tasks.push('release:dev');
-  }
-
-  //部署
-  if(options.deploy){
-    gulp.task('deploy',function () {
-      return gulp.src("dist/**")
-          .pipe(gulp.dest(options.deploy||"wwwroot"))
-    });
-
-    tasks.push('deploy');
-  }
-
-  //打包
   if(options.pack){
-    gulp.task('pack',function () {
-      _.log("打包资源为发布包...");
-      return gulp.src("dist/**")
-        .pipe($.zip(project.project+'-'+project.version+'.zip'))
-        .pipe(gulp.dest('.'));
-    });
-
     tasks.push('pack');
   }
 
   if(options.brower){
-    _.log("打开浏览器,开启服务监听");
-    gulp.task('brower',function () {
-      $.connect.server({
-        root: ['dist'],
-        livereload: true,
-        port: 3000
-      });
-
-      require('open')("http://localhost:3000");
-    });
-
     runSequence('brower');
   }
 
-  tasks.push('clean:template');
+  tasks.push('clean:tmp');
 
   if(options.watch){
     _.log("正在监听文件变化...");
     var  watchFunc = setTimeout(function(){},200);
-    var watcher = gulp.watch(['src/**/*','!src/template/*.js'], function(event){
+    var watcher = gulp.watch(app.src+"/**", function(event){
       _.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
       clearTimeout(watchFunc);
       watchFunc = setTimeout(function(){
