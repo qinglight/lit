@@ -1,6 +1,5 @@
 var through = require('through2');
 var gutil = require('gulp-util');
-var PluginError = gutil.PluginError;
 var _ = require('../kernel').util;
 var useref = require('useref');
 var vfs = require('vinyl-fs');
@@ -25,22 +24,31 @@ function _useref(options) {
         var pattern = "{"+searchPath.join(",")+"}/"+"{"+files.join(",")+"}";
         var src = vfs.src(pattern)
         src
-          .pipe(gulpif(!options.noconcat, concat(name)))
+          .pipe(gulpif(!options.noconcat, concat(options.dist+"/"+name)))
           .pipe(through.obj(function (newFile, encoding, callback) {
-              newFile.base=(function(){
-                var base = "";
-                _.forEach(searchPath,function(path){
-                  if(newFile.path.indexOf(newFile.base+path)==0){
-                    base = path;
-                  }
-                });
-                return base;
-              })();
-              that.push(newFile);
-              callback();
+
+            newFile.base=(function(){
+              var base;
+              _.forEach(searchPath,function(path){
+                if(newFile.path.indexOf(newFile.base+path)==0){
+                  base = path;
+                }
+              });
+              if(!base){
+                base = options.dist;
+              }
+              return base;
+            })();
+            that.push(newFile);
+            callback();
+
           }));
-      })
-    })
+      });
+    });
+
+    setTimeout(function () {
+      cb();
+    },1000)
   });
 }
 

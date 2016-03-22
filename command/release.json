@@ -4,10 +4,16 @@
 	"description":"打包、编译、开发测试中的相关工具",
 	"option":[
 		{
-			"op":"-u --uglify [uglify]",
-			"desc":"是否压缩(优化),启用内置的优化策略",
+			"op":"-u --uglify",
+			"desc":"是否压缩(优化),压缩混淆js和css的内容",
 			"type":"Boolean",
 			"key":"uglify"
+		},
+		{
+			"op":"-c --concat",
+			"desc":"是否合并(优化),将资源引用合并为一份,减少http请求数",
+			"type":"Boolean",
+			"key":"concat"
 		},
 		{
 			"op":"-w --watch [watch]",
@@ -26,12 +32,6 @@
 			"desc":"是否添加反缓存后缀",
 			"type":"Boolean",
 			"key":"suffix"
-		},
-		{
-			"op":"-d --deploy [deploy]",
-			"desc":"部署目录，必须为绝对路径，标识服务器访问目录的位置",
-			"type":"String",
-			"key":"deploy"
 		},
 		{
 			"op":"-b --brower [brower]",

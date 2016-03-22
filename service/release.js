@@ -98,7 +98,7 @@ exports.do = function(cmd,options) {
 
     return gulp.src([app.tmp+"/*.html"])
       .pipe(require("../tools/assemble")())
-      .pipe(require("../tools/useref")({searchPath: [app.src,app.tmp],noconcat:true}))
+      .pipe(require("../tools/useref")({searchPath: [app.src,app.tmp],dist:app.dist,noconcat:!options.concat}))
       .pipe($.if(function(file){
         return options.uglify&&file.extname&&file.extname==".js";
       },$.uglify()))
@@ -106,7 +106,7 @@ exports.do = function(cmd,options) {
         return options.uglify&&file.extname&&file.extname==".css";
       },$.minifyCss({cache: true})))
       .pipe($.if(function(file){
-        return options.suffix;
+        return options.suffix&&file.extname&&file.extname!=".html";
       },$.rev()))
       .pipe($.revReplace())
       .pipe(gulp.dest(app.dist))
