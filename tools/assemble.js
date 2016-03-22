@@ -14,6 +14,7 @@ function assemble(options) {
   return through.obj(function(file, enc, cb) {
     var html = new HtmlDom(file.contents);
     var views = html.$("view");
+    var components = html.$("component");
     var snippets = html.$("snippet");
     var templates = html.$("script[type=text/template][src]");
     var that = this;
@@ -63,6 +64,28 @@ function assemble(options) {
         html.$("script[src]").eq(-1).after('<script type="text/javascript" src="js/view/'+attrs.id+'.js"></script>');
       });
     }
+
+    //引入组件资源
+    _.forEach(components,function(component){
+      var attrs = component.attributes;
+      var componentCode = (function(){
+        if(_.exists(root+"/src/html/component/"+attrs.id+".html")){
+          return _.readFileSync(root+"/src/html/component/"+attrs.id+".html");
+        }
+
+        if(_.exists(root+"/.tmp/html/component/"+attrs.id+".html")){
+          return _.readFileSync(root+"/.tmp/html/component/"+attrs.id+".html");
+        }
+
+        return "";
+      })();
+
+      html.$(component).after(componentCode);
+      html.$(component).remove();
+
+      //引入js资源
+      html.$("script[src]").eq(-1).after('<script type="text/javascript" src="js/component/'+attrs.id+'.js"></script>');
+    });
 
     //引入代码片段
     _.forEach(snippets,function(snippet){
