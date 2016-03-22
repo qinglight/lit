@@ -1,6 +1,4 @@
 var through = require('through2');
-var gutil = require('gulp-util');
-var PluginError = gutil.PluginError;
 var HtmlDom = require('htmldom');
 var _ = require('../kernel').util;
 
@@ -18,6 +16,7 @@ function assemble(options) {
     var views = html.$("view");
     var snippets = html.$("snippet");
     var templates = html.$("script[type=text/template][src]");
+    var that = this;
 
     //引入模板资源
     _.forEach(templates,function(template){
@@ -35,19 +34,29 @@ function assemble(options) {
 
       _.forEach(views,function(view){
         var attrs = view.attributes;
-        var viewCode = (function(){
+        if(options.type!="light"){
           if(_.exists(root+"/src/html/view/"+attrs.id+".html")){
-            return _.readFileSync(root+"/src/html/view/"+attrs.id+".html");
+            _.copyFileSync(root+"/src/html/view/"+attrs.id+".html",root+"/dist/html/view/"+attrs.id+".html");
           }
 
           if(_.exists(root+"/.tmp/html/view/"+attrs.id+".html")){
-            return _.readFileSync(root+"/.tmp/html/view/"+attrs.id+".html");
+            _.copyFileSync(root+"/.tmp/html/view/"+attrs.id+".html",root+"/dist/html/view/"+attrs.id+".html");
           }
+        }else{
+          var viewCode = (function(){
+            if(_.exists(root+"/src/html/view/"+attrs.id+".html")){
+              return _.readFileSync(root+"/src/html/view/"+attrs.id+".html");
+            }
 
-          return "";
-        })();
+            if(_.exists(root+"/.tmp/html/view/"+attrs.id+".html")){
+              return _.readFileSync(root+"/.tmp/html/view/"+attrs.id+".html");
+            }
 
-        html.$(view).after(viewCode);
+            return "";
+          })();
+
+          html.$(view).after(viewCode);
+        }
         html.$(view).remove();
 
         //引入js资源

@@ -102,7 +102,7 @@ exports.do = function(cmd,options) {
     _.log("准备资源处理...");
 
     return gulp.src([app.tmp+"/*.html"])
-      .pipe(require("../tools/assemble")())
+      .pipe(require("../tools/assemble")({type:project.type||"light"}))
       .pipe(require("../tools/useref")({searchPath: [app.src,app.tmp],dist:app.dist,noconcat:!options.concat}))
       .pipe($.if(function(file){
         return options.uglify&&file.extname&&file.extname==".js";
