@@ -91,6 +91,11 @@ gulp.task('brower',function () {
 //-----------------------------------------
 
 exports.do = function(cmd,options) {
+  if(options.product){
+    options.suffix=true;
+    options.uglify=true;
+    options.concat=true;
+  }
 
   //-------------资源集成---------------------
   gulp.task('release',['resources','template','html','less'],function () {

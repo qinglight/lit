@@ -10,6 +10,12 @@
 			"key":"uglify"
 		},
 		{
+			"op":"--product",
+			"desc":"生产环境的组合优化选项,包含压缩合并以及增加后缀策略",
+			"type":"Boolean",
+			"key":"product"
+		},
+		{
 			"op":"-c --concat",
 			"desc":"是否合并(优化),将资源引用合并为一份,减少http请求数",
 			"type":"Boolean",
