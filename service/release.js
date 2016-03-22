@@ -133,7 +133,7 @@ exports.do = function(cmd,options) {
   if(options.watch){
     _.log("正在监听文件变化...");
     var  watchFunc = setTimeout(function(){},200);
-    var watcher = gulp.watch(app.src+"/**", function(event){
+    var watcher = gulp.watch(process.cwd()+"/"+app.src+"/**/*", function(event){
       _.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
       clearTimeout(watchFunc);
       watchFunc = setTimeout(function(){
