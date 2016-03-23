@@ -11,6 +11,7 @@
     "fis-scaffold-kernel": "^0.1.1",
     "fs-utils": "^0.7.0",
     "gulp": "^3.9.1",
+    "gulp-coffee": "^2.3.1",
     "gulp-concat": "^2.6.0",
     "gulp-connect": "^3.1.0",
     "gulp-if": "^2.0.0",

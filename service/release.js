@@ -65,6 +65,13 @@ gulp.task('less',function(){
     .pipe(gulp.dest(app.tmp+"/css"))
 });
 
+gulp.task('coffee',function(){
+  _.log("编译coffeeScript文件")
+  return gulp.src([app.src+'/js/**/*.coffee'])
+      .pipe($.less())
+      .pipe(gulp.dest(app.tmp+"/js"))
+});
+
 gulp.task('html',['jade'],function(){
   return gulp.src([app.src+'/html/page/*.html',app.tmp+'/html/page/*.html'])
     .pipe(gulp.dest(app.tmp))
@@ -98,7 +105,7 @@ exports.do = function(cmd,options) {
   }
 
   //-------------资源集成---------------------
-  gulp.task('release',['resources','template','html','less'],function () {
+  gulp.task('release',['resources','template','html','less','coffee'],function () {
     _.log("准备资源处理...");
 
     return gulp.src([app.tmp+"/*.html"])
