@@ -1,6 +1,6 @@
 var jres = require('../kernel'),
   _ = jres.util,
-  project = require(process.cwd()+'/project.json'),
+  project = _.exists(process.cwd()+'/project.json')?require(process.cwd()+'/project.json'):{},
   lazypipe = require('lazypipe');
 
 //gulp
