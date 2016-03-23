@@ -68,7 +68,7 @@ gulp.task('less',function(){
 gulp.task('coffee',function(){
   _.log("编译coffeeScript文件")
   return gulp.src([app.src+'/js/**/*.coffee'])
-      .pipe($.less())
+      .pipe($.coffee())
       .pipe(gulp.dest(app.tmp+"/js"))
 });
 
