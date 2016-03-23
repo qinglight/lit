@@ -115,6 +115,7 @@ exports.do = function(cmd,options) {
       },$.rev()))
       .pipe($.revReplace())
       .pipe(gulp.dest(app.dist))
+      .pipe($.if(options.watch,$.connect.reload()))
   });
   //-----------------------------------------
   
