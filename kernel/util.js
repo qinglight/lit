@@ -5,7 +5,7 @@ var log4js = require('log4js'),
 
 log4js.loadAppender('console');
 
-var logger = log4js.getLogger('jres');
+var logger = log4js.getLogger('light');
 logger.setLevel('debug');
 
 lodash.merge(_,lodash,fs);

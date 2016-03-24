@@ -16,7 +16,7 @@ app = {
 
 //--------------清除------------------------
 gulp.task('clean:tmp', function (cb) {
-  _.log("清除模板编译输出");
+  _.log("清除临时目录");
   _.del(app.tmp,cb);
 });
 
@@ -95,6 +95,11 @@ gulp.task('brower',function () {
   });
   require('open')("http://localhost:3000");
 });
+
+gulp.task('reload', function (cb) {
+  gulp.src(app.dist).pipe($.connect.reload());
+  cb();
+});
 //-----------------------------------------
 
 exports.do = function(cmd,options) {
@@ -105,7 +110,7 @@ exports.do = function(cmd,options) {
   }
 
   //-------------资源集成---------------------
-  gulp.task('release',['resources','template','html','less','coffee'],function () {
+  gulp.task('release',['resources','template','html','less','coffee'],function (cb) {
     _.log("准备资源处理...");
 
     return gulp.src([app.tmp+"/*.html"])
@@ -121,8 +126,7 @@ exports.do = function(cmd,options) {
         return options.suffix&&file.extname&&file.extname!=".html";
       },$.rev()))
       .pipe($.revReplace())
-      .pipe(gulp.dest(app.dist))
-      .pipe($.if(options.watch,$.connect.reload()))
+      .pipe(gulp.dest(app.dist));
   });
   //-----------------------------------------
   
@@ -130,10 +134,6 @@ exports.do = function(cmd,options) {
 
   if(options.pack){
     tasks.push('pack');
-  }
-
-  if(options.brower){
-    runSequence('brower');
   }
 
   tasks.push('clean:tmp');
@@ -149,5 +149,11 @@ exports.do = function(cmd,options) {
       },300)
     });
   }
-  runSequence.apply(null,tasks);
+
+  if(options.brower){
+    runSequence.apply(null,_.concat(tasks,['brower','reload']));
+    tasks.push("reload");
+  }else{
+    runSequence.apply(null,tasks);
+  }
 }
