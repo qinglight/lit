@@ -30,7 +30,7 @@ function assemble(options) {
 
     //引入视图资源
     if(views.length>0){
-      var filename = file.path.split("/").pop().split("\.")[0];
+      var filename = file.relative.split("\.")[0];
       html.$("script[src]").eq(-1).after('<script type="text/javascript" src="js/regist/'+filename+'.js"></script>');
 
       _.forEach(views,function(view){

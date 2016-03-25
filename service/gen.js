@@ -40,10 +40,8 @@ App.registView("<%=views[view].id%>",new App.View({
     },
     "angular":{
       view:_.template(`
-<div class="container" view="<%=id%>">
-  <div class="row">
-      <div class="col-xs-12"></div>
-  </div>
+<div class="row" view="<%=id%>">
+    <div class="col-xs-12"></div>
 </div>
       `),
       regist:_.template(`
