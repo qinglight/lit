@@ -21,7 +21,13 @@ function _useref(options) {
     _.map(output[1],function(type){
       _.map(type,function(files,name){
         files = files.assets;
+
         var pattern = "{"+searchPath.join(",")+"}/"+"{"+files.join(",")+"}";
+        if(files.length==1){
+          pattern = "{"+searchPath.join(",")+"}/"+ files[0];
+        }
+
+
         var src = vfs.src(pattern)
         src
           .pipe(gulpif(!options.noconcat, concat(options.dist+"/"+name)))
