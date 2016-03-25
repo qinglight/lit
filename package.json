@@ -1,6 +1,6 @@
 {
   "name": "lighting",
-  "version": "1.1.0-20160324",
+  "version": "1.1.0-20160325-2",
   "description": "恒生移动web应用平台（Light）快速开发集成工具箱",
   "main": "index.js",
   "dependencies": {
@@ -56,5 +56,37 @@
     "hundusn",
     "javascript",
     "devlope"
+  ],
+  "bundledDependencies": [
+    "ascii-art",
+    "bluebird",
+    "colors",
+    "commander",
+    "fis-scaffold-kernel",
+    "fs-utils",
+    "gulp",
+    "gulp-coffee",
+    "gulp-concat",
+    "gulp-connect",
+    "gulp-if",
+    "gulp-jade",
+    "gulp-less",
+    "gulp-load-plugins",
+    "gulp-minify-css",
+    "gulp-rev",
+    "gulp-rev-replace",
+    "gulp-uglify",
+    "gulp-util",
+    "gulp-zip",
+    "htmldom",
+    "lazypipe",
+    "lodash",
+    "log4js",
+    "open",
+    "run-sequence",
+    "scaffold",
+    "through2",
+    "useref",
+    "vinyl-fs"
   ]
 }

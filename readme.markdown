@@ -1,6 +1,10 @@
 # tools_based_on_gulp
 基于gulp的工具重构与重写,功能插件化
 
+### 更新说明(2016.03.25)
+1. 将所有依赖添加为bundle dependencies
+2. 依赖关系线性化，减少包体积
+
 ### 更新说明(2016.03.24)
 
 1. 去除release的type选项
