@@ -74,14 +74,18 @@ App.registView("<%=views[view].id%>",new App.View({
     }
   }
 
-  var H= require('htmldom');
+  var cheerio = require('cheerio');
   _.glob("src/html/page/*.html",function(err,result){
     _.forEach(result,function(page){
       var tpl = tpls[project.type||"light"];
 
       var filename = _.normalizePath(page).split("/").pop().split("\.")[0];
       var regist = "src/js/regist/"+filename+".js";
-      var views = new H(_.readFileSync(page)).$("view");
+
+      var $ = cheerio.load(_.readFileSync(page),{
+        recognizeSelfClosing:true
+      })
+      var views = $("view");
       var viewsAttrs = {
         views:[]
       };
@@ -89,7 +93,7 @@ App.registView("<%=views[view].id%>",new App.View({
         var attrs = _.merge({
           async:false,
           home:false
-        },view.attributes);
+        },view.attribs);
 
         viewsAttrs.views.push(attrs);
 
