@@ -1,115 +1,73 @@
 var through = require('through2');
-var HtmlDom = require('htmldom');
 var _ = require('../kernel').util;
+var config = require('../kernel').config;
+var cheerio = require('cheerio');
+var File = require('gulp-util').File;
 
-const PLUGIN_NAME = 'gulp-light-assemble';
 /**
  * 主要是组装html代码,引入模板和视图资源,包括组件的js个视图资源
  * @param  {[type]} options [description]
  * @return {[type]}         [description]
  */
 function assemble(options) {
-  var root = process.cwd();
 
   return through.obj(function(file, enc, cb) {
-    var html = new HtmlDom(file.contents);
-    var views = html.$("view");
-    var components = html.$("component");
-    var snippets = html.$("snippet");
-    var templates = html.$("script[type=text/template][src]");
-    var that = this;
-
-    //引入模板资源
-    _.forEach(templates,function(template){
-      var tpls = template.attributes.src.split(",");
-      _.forEach(tpls,function(tpl){
-        html.$("script[src]").eq(-1).after('<script type="text/javascript" src="template/'+tpl+'.js"></script>');
-      });
-       html.$(template).remove();
+    file = new File({
+      cwd: file.cwd,
+      base: file.base,
+      path: file.path,
+      contents: file.contents
     });
 
-    //引入视图资源
-    if(views.length>0){
-      var filename = file.relative.split("\.")[0];
-      html.$("script[src]").eq(-1).after('<script type="text/javascript" src="js/regist/'+filename+'.js"></script>');
+    var $ = cheerio.load(file.contents,{
+      recognizeSelfClosing:true
+    });
 
-      _.forEach(views,function(view){
-        var attrs = view.attributes;
-        if(options.type!="light"){
-          if(_.exists(root+"/src/html/view/"+attrs.id+".html")){
-            _.copyFileSync(root+"/src/html/view/"+attrs.id+".html",root+"/dist/html/view/"+attrs.id+".html");
-          }
+    //视图
+    var views = $("view");
+    var script = $("<script type='text/javascript'></script>");
+    var filename = file.stem||file.basename.split("\.")[0];
+    var regist = script.clone().attr("src","js/regist/"+filename+".js").attr("light-attr-type","regist");
 
-          if(_.exists(root+"/.tmp/html/view/"+attrs.id+".html")){
-            _.copyFileSync(root+"/.tmp/html/view/"+attrs.id+".html",root+"/dist/html/view/"+attrs.id+".html");
-          }
-        }else{
-          var viewCode = (function(){
-            if(_.exists(root+"/src/html/view/"+attrs.id+".html")){
-              return _.readFileSync(root+"/src/html/view/"+attrs.id+".html");
-            }
+    _.forEach($("body").contents(), function (node) {
+      if(node.type=="comment"&&node.data.trim()=="inject:view"){
+        $(node.next.next).remove();
+        $(node).replaceWith(regist);
+      }
+    });
 
-            if(_.exists(root+"/.tmp/html/view/"+attrs.id+".html")){
-              return _.readFileSync(root+"/.tmp/html/view/"+attrs.id+".html");
-            }
-
-            return "";
-          })();
-
-          html.$(view).after(viewCode);
-        }
-        html.$(view).remove();
-
-        //引入js资源
-        html.$("script[src]").eq(-1).after('<script type="text/javascript" src="js/view/'+attrs.id+'.js"></script>');
-      });
+    if($("script[light-attr-type=regist]").length==0){
+      regist.appendTo($("body"));
     }
+    _.forEach(views, function (view) {
+      var attrs = view.attribs;
+      $(view).replaceWith(_.readFileSync("src/html/view/"+attrs.id+".html"));
 
-    //引入组件资源
-    _.forEach(components,function(component){
-      var attrs = component.attributes;
-      var componentCode = (function(){
-        if(_.exists(root+"/src/html/component/"+attrs.id+".html")){
-          return _.readFileSync(root+"/src/html/component/"+attrs.id+".html");
-        }
-
-        if(_.exists(root+"/.tmp/html/component/"+attrs.id+".html")){
-          return _.readFileSync(root+"/.tmp/html/component/"+attrs.id+".html");
-        }
-
-        return "";
-      })();
-
-      html.$(component).after(componentCode);
-      html.$(component).remove();
-
-      //引入js资源
-      html.$("script[src]").eq(-1).after('<script type="text/javascript" src="js/component/'+attrs.id+'.js"></script>');
+      var view_js = script.clone().attr("src","js/view/"+attrs.id+".js");
+      $("script[light-attr-type=regist]").after(view_js);
     });
 
-    //引入代码片段
-    _.forEach(snippets,function(snippet){
-      var attrs = snippet.attributes;
 
-      var snippetCode = (function(){
-        if(_.exists(root+"/src/html/snippet/"+attrs.id+".html")){
-          return _.readFileSync(root+"/src/html/snippet/"+attrs.id+".html");
-        }
+    //组件
+    var components = $("component");
+    _.forEach(components, function (component) {
+      var attrs = component.attribs;
+      $(component).replaceWith(_.readFileSync("src/html/component/"+attrs.id+".html"));
 
-        if(_.exists(root+"/.tmp/html/snippet/"+attrs.id+".html")){
-          return _.readFileSync(root+"/.tmp/html/snippet/"+attrs.id+".html");
-        }
-
-        return "";
-      })();
-
-      html.$(snippet).after(snippetCode);
-      html.$(snippet).remove();
+      var component_js = script.clone().attr("src","js/component/"+attrs.id+".js");
+      $("script[light-attr-type=regist]").after(component_js);
     });
 
-    file.contents = new Buffer(html.beautify());
+    //代码片段
+    var snippets = $("snippet");
+    _.forEach(snippets, function (snippet) {
+      var attrs = snippet.attribs;
+      $(snippet).replaceWith(_.readFileSync("src/html/snippet/"+attrs.id+".html"));
+    });
 
-    cb(null, file);
+    file.contents = new Buffer($.html());
+    this.push(file)
+    cb();
   });
 }
 

@@ -115,7 +115,7 @@ exports.do = function(cmd,options) {
 
     return gulp.src([app.tmp+"/*.html"])
       .pipe(require("../tools/assemble")({type:project.type||"light"}))
-      .pipe(require("../tools/useref")({searchPath: [app.src,app.tmp],dist:app.dist,noconcat:!options.concat}))
+      .pipe(require("../tools/useref")({noconcat:!options.concat}))
       .pipe($.if(function(file){
         return options.uglify&&file.extname&&file.extname==".js";
       },$.uglify()))

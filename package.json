@@ -6,6 +6,7 @@
   "dependencies": {
     "ascii-art": "0.0.2-alpha",
     "bluebird": "^3.3.4",
+    "cheerio": "^0.20.0",
     "colors": "^1.0.3",
     "commander": "^2.6.0",
     "fis-scaffold-kernel": "^0.1.1",
