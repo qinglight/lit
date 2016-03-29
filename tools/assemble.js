@@ -41,7 +41,7 @@ function assemble(options) {
     }
     _.forEach(views, function (view) {
       var attrs = view.attribs;
-      $(view).replaceWith(_.readFileSync("src/html/view/"+attrs.id+".html"));
+      $(view).replaceWith(_.exists(config.src+"/html/view/"+attrs.id+".html")?_.readFileSync(config.src+"/html/view/"+attrs.id+".html"):_.readFileSync(config.tmp+"/html/view/"+attrs.id+".html"));
 
       var view_js = script.clone().attr("src","js/view/"+attrs.id+".js");
       $("script[light-attr-type=regist]").after(view_js);
@@ -52,7 +52,7 @@ function assemble(options) {
     var components = $("component");
     _.forEach(components, function (component) {
       var attrs = component.attribs;
-      $(component).replaceWith(_.readFileSync("src/html/component/"+attrs.id+".html"));
+      $(component).replaceWith(_.exists(config.src+"/html/component/"+attrs.id+".html")?_.readFileSync(config.src+"/html/component/"+attrs.id+".html"):_.readFileSync(config.tmp+"/html/component/"+attrs.id+".html"));
 
       var component_js = script.clone().attr("src","js/component/"+attrs.id+".js");
       $("script[light-attr-type=regist]").after(component_js);
@@ -62,7 +62,7 @@ function assemble(options) {
     var snippets = $("snippet");
     _.forEach(snippets, function (snippet) {
       var attrs = snippet.attribs;
-      $(snippet).replaceWith(_.readFileSync("src/html/snippet/"+attrs.id+".html"));
+      $(snippet).replaceWith(_.exists(config.src+"/html/snippet/"+attrs.id+".html")?_.readFileSync(config.src+"/html/snippet/"+attrs.id+".html"):_.readFileSync(config.tmp+"/html/snippet/"+attrs.id+".html"));
     });
 
     file.contents = new Buffer($.html());
