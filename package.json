@@ -1,6 +1,6 @@
 {
   "name": "lighting",
-  "version": "1.1.0-20160325-4",
+  "version": "1.1.0-20160329",
   "description": "恒生移动web应用平台（Light）快速开发集成工具箱",
   "main": "index.js",
   "dependencies": {
@@ -25,7 +25,6 @@
     "gulp-uglify": "^1.5.3",
     "gulp-util": "^3.0.7",
     "gulp-zip": "^3.2.0",
-    "htmldom": "https://github.com/hs-light/htmldom/tarball/master",
     "lazypipe": "^1.0.1",
     "lodash": "^4.6.1",
     "log4js": "^0.6.22",
@@ -79,7 +78,7 @@
     "gulp-uglify",
     "gulp-util",
     "gulp-zip",
-    "htmldom",
+    "cheerio",
     "lazypipe",
     "lodash",
     "log4js",
