@@ -43,7 +43,7 @@ function _useref(options) {
           .pipe(gulpif(name!=null&&!options.noconcat,concat(config.dist+"/"+name)))
           .pipe(through.obj(function (newFile, encoding, callback) {
             _.forEach([config.tmp,config.src,config.dist], function (path) {
-              if(newFile.path.indexOf(process.cwd()+"/"+path+"/")==0){
+              if(newFile.path.indexOf(process.cwd()+"/"+path+"/")==0||newFile.path.indexOf(process.cwd()+"\\"+path+"\\")==0){
                 newFile.base=process.cwd()+"/"+path+"/";
               }
             });

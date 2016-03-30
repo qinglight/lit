@@ -79,7 +79,7 @@ App.registView("<%=views[view].id%>",new App.View({
     _.forEach(result,function(page){
       var tpl = tpls[project.type||"light"];
 
-      var filename = _.normalizePath(page).split("/").pop().split("\.")[0];
+      var filename = page.split(new RegExp("[\\|/]")).pop().replace("\.html","");
       var regist = "src/js/regist/"+filename+".js";
 
       var $ = cheerio.load(_.readFileSync(page),{
