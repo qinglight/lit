@@ -25,7 +25,7 @@ function assemble(options) {
 
     //视图
     var views = $("view");
-    var script = $("<script type='text/javascript'></script>");
+    var script = $("\n<script type='text/javascript'></script>");
     var filename = file.stem||file.basename.split("\.")[0];
     var regist = script.clone().attr("src","js/regist/"+filename+".js").attr("light-attr-type","regist");
 
