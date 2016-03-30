@@ -1,10 +1,6 @@
 var through = require('through2');
 var gutil = require('gulp-util');
-var PluginError = gutil.PluginError;
-var HtmlDom = require('htmldom');
 var _ = require('../kernel').util;
-
-const PLUGIN_NAME = 'gulp-light-template';
 
 function template(options) {
 

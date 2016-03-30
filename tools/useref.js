@@ -28,6 +28,7 @@ function _useref(options) {
     _.forEach(_css, function (file) {
       css.push(file.attribs.href);
     });
+
     var unprecessStream = js.length+css.length+1;
 
     function processStream(files,name){
@@ -39,7 +40,7 @@ function _useref(options) {
         pattern = "{"+config.tmp+","+config.src+"}/"+files[0];
       }
       vfs.src(pattern)
-          .pipe(gulpif(name!=null,concat(config.dist+"/"+name)))
+          .pipe(gulpif(name!=null&&!options.noconcat,concat(config.dist+"/"+name)))
           .pipe(through.obj(function (newFile, encoding, callback) {
             _.forEach([config.tmp,config.src,config.dist], function (path) {
               if(newFile.path.indexOf(process.cwd()+"/"+path+"/")==0){
@@ -56,16 +57,18 @@ function _useref(options) {
     }
 
     //先处理合并
-    _.forEach(output[1].css, function (file,key) {
-      css.splice(css.indexOf(key),1);
-      processStream(file.assets,key);
-    });
+    if(!options.noconcat){
+      _.forEach(output[1].css, function (file,key) {
+        css.splice(css.indexOf(key),1);
+        processStream(file.assets,key);
+      });
 
-    //先处理合并
-    _.forEach(output[1].js, function (file,key) {
-      js.splice(js.indexOf(key),1);
-      processStream(file.assets,key);
-    });
+      _.forEach(output[1].js, function (file,key) {
+        js.splice(js.indexOf(key),1);
+        processStream(file.assets,key);
+      });
+    }
+
 
     _.forEach(js, function (file) {
       processStream(file);
