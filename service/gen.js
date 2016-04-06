@@ -1,6 +1,7 @@
 var jres = require('../kernel'),
 	_ = jres.util,
-    project = require(process.cwd()+'/project.json');
+    project = require(process.cwd()+'/project.json'),
+  Book = require('gitbook').Book;;
 
 
 exports.do = function(cmd,options) {
@@ -116,5 +117,11 @@ App.registView("<%=views[view].id%>",new App.View({
       });
       _.writeFileSync(regist,tpl.regist(viewsAttrs));
     })
-  })
+  });
+
+  if(options.withDoc){
+    //创建文档目录
+    var initRoot = 'src/doc';
+    Book.init(initRoot);
+  }
 }

@@ -2,6 +2,7 @@ var jres = require('../kernel'),
 		_ = jres.util,
 		path = require('path');
 
+var Book = require('gitbook').Book;
 
 var types = {
   blank:"scaffold",
@@ -129,7 +130,13 @@ exports.do = function(directory,options){
           doReplace(directory+'/src/html/page/index.html',{
             name:options.name,
             desc:options.description
-          })
+          });
+
+          if(options.withDoc){
+            //创建文档目录
+            var initRoot = path.resolve(directory, 'src/doc');
+            Book.init(initRoot);
+          }
         });
       }
     })

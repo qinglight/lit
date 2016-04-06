@@ -1,7 +1,8 @@
 var jres = require('../kernel'),
   _ = jres.util,
   project = _.exists(process.cwd()+'/project.json')?require(process.cwd()+'/project.json'):{},
-  lazypipe = require('lazypipe');
+  lazypipe = require('lazypipe'),
+  gitbook = require('gitbook');
 
 //gulp
 var gulp = require('gulp');
@@ -31,7 +32,7 @@ gulp.task('resources',function(){
   _.log("资源输出dist目录");
 
   project.ignore = project.ignore || [];
-  var _ignore  = _.union(project.ignore,['html/**','js/**','css/**','template/**']);
+  var _ignore  = _.union(project.ignore,['html/**','js/**','doc/**','css/**','template/**']);
   var ignore = [];
 
   _.forEach(_ignore,function(value){
@@ -100,6 +101,29 @@ gulp.task('reload', function (cb) {
   gulp.src(app.dist).pipe($.connect.reload());
   cb();
 });
+
+
+gulp.task('gitbook', function (cb) {
+  _.log("正在编译生成文档！");
+  var book = new gitbook.Book(app.src+"/doc/", {
+    "config": {
+      "output": app.dist+"/doc/",
+      "theme": require("path").resolve(__dirname,"../tools/themes/theme"),
+      "plugins": [
+        "-highlight",
+        "-search",
+        "-sharing",
+        "-font-settings",
+        "-livereload"
+      ]
+    }
+  });
+  book.parse().then(function(){
+    return book.generate("website");
+  }).then(function(){
+    cb();
+  });
+});
 //-----------------------------------------
 
 exports.do = function(cmd,options) {
@@ -134,6 +158,10 @@ exports.do = function(cmd,options) {
 
   if(options.pack){
     tasks.push('pack');
+  }
+
+  if(options.doc){
+    tasks.push('gitbook');
   }
 
   tasks.push('clean:tmp');

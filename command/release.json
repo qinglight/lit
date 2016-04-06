@@ -44,6 +44,12 @@
 			"desc":"直接打开浏览器,同时打开server",
 			"type":"String",
 			"key":"brower"
+		},
+		{
+			"op":"--doc",
+			"desc":"是否编译生成文档",
+			"type":"Boolean",
+			"key":"doc"
 		}
 	]
 }
