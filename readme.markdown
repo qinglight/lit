@@ -4,7 +4,7 @@
 ### 更新说明(2016.04.06)
 1. 修复当script标签在body之外的时候，无法正常找到节点的问题
 2. 增加文档内容的编译输出（以gitbook为样板）
-3. 修复angularjs框架下gen生成regist文件错误的问题
+3. 修复angularjs/light框架下gen生成regist文件错误的问题
 4. angularjs的试图文件是异步加载的，变更为异步加载
 5. 支持css目录里面包含图片文件
 6. 调整gitboot为budle模式

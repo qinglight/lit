@@ -11,11 +11,11 @@ exports.do = function(cmd,options) {
 <div id="<%=id%>" style="display:none;"></div>
       `),
       regist:_.template(`
-<%for(var view in views){%>
-App.registView("<%=views[view].id%>",new App.View({
-  el:"#<%=views[view].id%>",
+<%for(var i=0;i<views.length;i++){%>
+App.registView("<%=views[i].id%>",new App.View({
+  el:"#<%=views[i].id%>",
   model:new App.Model()
-}),<%=views[view].home%>);
+}),<%=views[i].home%>);
 <%}%>
       `),
       js:_.template(`
