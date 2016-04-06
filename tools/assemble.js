@@ -29,7 +29,7 @@ function assemble(options) {
     var filename = file.stem||file.basename.split("\.")[0];
     var regist = script.clone().attr("src","js/regist/"+filename+".js").attr("light-attr-type","regist");
 
-    _.forEach($("body").contents(), function (node) {
+    _.forEach($("html").contents(), function (node) {
       if(node.type=="comment"&&node.data.trim()=="inject:view"){
         $(node.next.next).remove();
         $(node).replaceWith(regist);
