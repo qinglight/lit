@@ -88,6 +88,7 @@
     "scaffold",
     "through2",
     "useref",
-    "vinyl-fs"
+    "vinyl-fs",
+    "gitbook"
   ]
 }

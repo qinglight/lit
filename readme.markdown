@@ -7,6 +7,7 @@
 3. 修复angularjs框架下gen生成regist文件错误的问题
 4. angularjs的试图文件是异步加载的，变更为异步加载
 5. 支持css目录里面包含图片文件
+6. 调整gitboot为budle模式
 
 ### 更新说明(2016.03.30)
 1. 去除模板编译时引入的htmldom
