@@ -51,7 +51,7 @@ App.registView("<%=views[view].id%>",new App.View({
   app.config(function ($routeProvider){
     $routeProvider
     <%var home;%>
-    <%for(var i in views){var view = views[i];%>
+    <%for(var i=0;i<views.length;i++){var view = views[i];%>
       .when('/<%=view.id%>', {
           controller: '<%=view.id%>',
           templateUrl: 'html/view/<%=view.id%>.html'
