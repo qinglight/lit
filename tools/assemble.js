@@ -3,6 +3,7 @@ var _ = require('../kernel').util;
 var config = require('../kernel').config;
 var cheerio = require('cheerio');
 var File = require('gulp-util').File;
+var project = _.exists(process.cwd()+'/project.json')?require(process.cwd()+'/project.json'):{};
 
 /**
  * 主要是组装html代码,引入模板和视图资源,包括组件的js个视图资源
@@ -41,7 +42,11 @@ function assemble(options) {
     }
     _.forEach(views, function (view) {
       var attrs = view.attribs;
-      $(view).replaceWith(_.exists(config.src+"/html/view/"+attrs.id+".html")?_.readFileSync(config.src+"/html/view/"+attrs.id+".html"):_.readFileSync(config.tmp+"/html/view/"+attrs.id+".html"));
+      if(project.type=="angular"){
+        _.exists(config.src+"/html/view/"+attrs.id+".html")?_.copyFileSync(config.src+"/html/view/"+attrs.id+".html",config.dist+"/html/view/"+attrs.id+".html"):_.copyFileSync(config.tmp+"/html/view/"+attrs.id+".html",config.dist+"/html/view/"+attrs.id+".html");
+      }else{
+        $(view).replaceWith(_.exists(config.src+"/html/view/"+attrs.id+".html")?_.readFileSync(config.src+"/html/view/"+attrs.id+".html"):_.readFileSync(config.tmp+"/html/view/"+attrs.id+".html"));
+      }
 
       var view_js = script.clone().attr("src","js/view/"+attrs.id+".js");
       $("script[light-attr-type=regist]").after(view_js);

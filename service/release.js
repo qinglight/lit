@@ -32,7 +32,7 @@ gulp.task('resources',function(){
   _.log("资源输出dist目录");
 
   project.ignore = project.ignore || [];
-  var _ignore  = _.union(project.ignore,['html/**','js/**','doc/**','css/**','template/**']);
+  var _ignore  = _.union(project.ignore,['html/**','js/**','doc/**','css/**/*.css','css/**/*.less','template/**']);
   var ignore = [];
 
   _.forEach(_ignore,function(value){
