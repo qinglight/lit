@@ -5,7 +5,7 @@ var jres = require('../kernel'),
 var Book = require('gitbook').Book;
 
 var types = {
-  blank:"scaffold",
+  light:"scaffold",
   angular:"scaffold-angularjs",
   demo:"master",
   f7:"scaffold-f7"
