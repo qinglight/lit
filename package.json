@@ -1,6 +1,6 @@
 {
   "name": "lighting",
-  "version": "1.1.0-20160406-4",
+  "version": "1.1.0-20160414",
   "description": "恒生移动web应用平台（Light）快速开发集成工具箱",
   "main": "index.js",
   "dependencies": {
@@ -17,6 +17,7 @@
     "gulp-concat": "^2.6.0",
     "gulp-connect": "^3.1.0",
     "gulp-if": "^2.0.0",
+    "gulp-imagemin": "^2.4.0",
     "gulp-jade": "^1.1.0",
     "gulp-less": "^3.0.5",
     "gulp-load-plugins": "^1.2.0",
@@ -78,6 +79,7 @@
     "gulp-rev-replace",
     "gulp-uglify",
     "gulp-util",
+    "gulp-imagemin",
     "gulp-zip",
     "cheerio",
     "lazypipe",

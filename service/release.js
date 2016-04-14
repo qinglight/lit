@@ -73,6 +73,16 @@ gulp.task('coffee',function(){
       .pipe(gulp.dest(app.tmp+"/js"))
 });
 
+gulp.task('images',function(){
+  _.log("压缩处理图片文件");
+  return gulp.src([app.src+'/images/**'])
+      .pipe($.imagemin({
+        progressive: true,
+        svgoPlugins: [{removeViewBox: false}]
+      }))
+      .pipe(gulp.dest(app.dist+"/images/"))
+});
+
 gulp.task('html',['jade'],function(){
   return gulp.src([app.src+'/html/page/*.html',app.tmp+'/html/page/*.html'])
     .pipe(gulp.dest(app.tmp))
@@ -162,6 +172,10 @@ exports.do = function(cmd,options) {
 
   if(options.doc){
     tasks.push('gitbook');
+  }
+
+  if(options.minifyImage){
+    tasks.push("images");
   }
 
   tasks.push('clean:tmp');
