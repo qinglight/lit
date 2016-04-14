@@ -53,15 +53,9 @@
 		},
 		{
 			"op":"-m --minify-image",
-			"desc":"是否编译生成文档",
+			"desc":"是否压缩图片",
 			"type":"Boolean",
 			"key":"minifyImage"
-		},
-		{
-			"op":"--sprite",
-			"desc":"是否启用图片精灵",
-			"type":"Boolean",
-			"key":"sprite"
 		}
 	]
 }
