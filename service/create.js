@@ -12,7 +12,8 @@ var types = {
 }
 
 exports.do = function(directory,options){
-	directory = directory || ".";
+  options.name = directory ;
+
 	
 	var scaffold = new (require('fis-scaffold-kernel'))({
     type: 'github',
@@ -99,6 +100,7 @@ exports.do = function(directory,options){
     })
   }).then(function(){
     return new Promise(function (resolve) {
+      directory = directory || options.name;
       if(_.exists(directory)){
         scaffold.prompt([
           {
@@ -116,7 +118,7 @@ exports.do = function(directory,options){
       }
 
       function initProject(){
-        var branch  = types[options.type||'blank'];
+        var branch  = types[options.type||'light'];
 
         scaffold.download('wyub/light-dev-demo@'+branch, function (err, temp_path) {
           
