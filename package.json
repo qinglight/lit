@@ -1,6 +1,6 @@
 {
   "name": "lighting",
-  "version": "1.1.0-20160414-1",
+  "version": "1.1.0-20160415",
   "description": "恒生移动web应用平台（Light）快速开发集成工具箱",
   "main": "index.js",
   "dependencies": {

@@ -4,10 +4,10 @@
 	"description":"初始化工程的视图js和组件的js的模版结构，必须保证page的html中配置了view或者component标签，否则无法生效",
 	"option":[
 		{
-			"op":"-o --overide [overide]",
+			"op":"-o --override [override]",
 			"desc":"代码生成的策略，默认当文件存在的时候不覆盖，当配置此参数后覆盖原代码",
 			"type":"Boolean",
-			"key":"overide"
+			"key":"override"
 		},
 		{
 			"op":"--with-doc",

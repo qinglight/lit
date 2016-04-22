@@ -101,14 +101,14 @@ App.registView("<%=views[i].id%>",new App.View({
         var html = "src/html/view/"+attrs.id+".html";
         var js = "src/js/view/"+attrs.id+".js";
 
-        if(!_.exists(html)||options.overide){
+        if(!_.exists(html)||options.override){
            _.writeFileSync(html,tpl.view(attrs));
            _.log("生成视图(html):"+attrs.id);
         }else{
           _.log("视图(html)"+attrs.id+"已经存在,跳过代码生成,如需要强制覆盖,请添加-o选项");
         }
 
-        if(!_.exists(js)||options.overide){
+        if(!_.exists(js)||options.override){
           _.writeFileSync(js,tpl.js(attrs));
           _.log("生成视图(js):"+attrs.id);
         }else{

@@ -12,7 +12,7 @@ exports.do = function(cmd,options) {
 	gulp.task('server',function () {
     $.connect.server({
       root: options.root,
-      livereload: false,
+      livereload: true,
       port: options.port
     });
   });

@@ -12,7 +12,7 @@ var types = {
 }
 
 exports.do = function(directory,options){
-  options.name = directory ;
+  options.name =  options.name || directory ;
 
 	
 	var scaffold = new (require('fis-scaffold-kernel'))({
@@ -101,7 +101,7 @@ exports.do = function(directory,options){
   }).then(function(){
     return new Promise(function (resolve) {
       directory = directory || options.name;
-      if(_.exists(directory)){
+      if(_.exists(directory)&&!options.force){
         scaffold.prompt([
           {
             description: directory+'目录已经存在,需要删除(不可撤销)后继续吗?',
@@ -138,6 +138,10 @@ exports.do = function(directory,options){
             //创建文档目录
             var initRoot = path.resolve(directory, 'src/doc');
             Book.init(initRoot);
+          }
+
+          if(options.callback){
+            options.callback();
           }
         });
       }

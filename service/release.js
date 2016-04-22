@@ -1,6 +1,6 @@
 var jres = require('../kernel'),
   _ = jres.util,
-  project = _.exists(process.cwd()+'/project.json')?require(process.cwd()+'/project.json'):{},
+  project,
   lazypipe = require('lazypipe'),
   gitbook = require('gitbook');
 
@@ -137,6 +137,8 @@ gulp.task('gitbook', function (cb) {
 //-----------------------------------------
 
 exports.do = function(cmd,options) {
+  project = _.exists(process.cwd()+'/project.json')?require(process.cwd()+'/project.json'):{}
+
   if(options.product){
     options.suffix=true;
     options.uglify=true;
