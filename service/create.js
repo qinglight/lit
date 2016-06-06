@@ -2,7 +2,7 @@ var jres = require('../kernel'),
 		_ = jres.util,
 		path = require('path');
 
-var Book = require('gitbook').Book;
+// var Book = require('gitbook').Book;
 
 var types = {
   light:"scaffold",
@@ -133,12 +133,13 @@ exports.do = function(directory,options){
             name:options.name,
             desc:options.description
           });
-
+          
+          /*
           if(options.withDoc){
             //创建文档目录
             var initRoot = path.resolve(directory, 'src/doc');
             Book.init(initRoot);
-          }
+          }*/
 
           if(options.callback){
             options.callback();

@@ -47,8 +47,11 @@ function main(argv){
 
 module.exports.run=main;
 module.exports.light=light;
-module.exports.api= function (cwd,cmd, options) {
-	var action = require('./service/'+cmd).do;
+module.exports.api= function (cwd,cmd, options,logger) {
+	if(logger){
+		light.util.log=logger;
+	}
+	var action = require("./service/"+cmd).do;
 	process.chdir(cwd);
-	action(null,options);
+	return action(null,options);
 };

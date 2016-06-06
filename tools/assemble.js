@@ -36,10 +36,16 @@ function assemble(options) {
         $(node).replaceWith(regist);
       }
     });
+    _.forEach($("body").contents(), function (node) {
+      if(node.type=="comment"&&node.data.trim()=="inject:view"){
+        $(node.next.next).remove();
+        $(node).replaceWith(regist);
+      }
+    });
 
-    if($("script[light-attr-type=regist]").length==0){
-      regist.appendTo($("body"));
-    }
+    // if($("script[light-attr-type=regist]").length==0){
+    //   regist.appendTo($("body"));
+    // }
     _.forEach(views, function (view) {
       var attrs = view.attribs;
       if(project.type=="angular"){

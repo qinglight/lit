@@ -46,12 +46,6 @@
 			"key":"brower"
 		},
 		{
-			"op":"--doc",
-			"desc":"是否编译生成文档",
-			"type":"Boolean",
-			"key":"doc"
-		},
-		{
 			"op":"-m --minify-image",
 			"desc":"是否压缩图片",
 			"type":"Boolean",

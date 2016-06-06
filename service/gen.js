@@ -1,31 +1,30 @@
 var jres = require('../kernel'),
-	_ = jres.util,
-    project = require(process.cwd()+'/project.json'),
-  Book = require('gitbook').Book;;
+	_ = jres.util;
 
 
 exports.do = function(cmd,options) {
+  var project = require(process.cwd()+'/project.json')
   var tpls = {
     "light":{
       view:_.template(`
-<div id="<%=id%>" style="display:none;"></div>
+<div id="<%=vid%>" style="display:none;"></div>
       `),
       regist:_.template(`
 <%for(var i=0;i<views.length;i++){%>
-App.registView("<%=views[i].id%>",new App.View({
-  el:"#<%=views[i].id%>",
+App.registView("<%=views[i].vid%>",new App.View({
+  el:"#<%=views[i].vid%>",
   model:new App.Model()
 }),<%=views[i].home%>);
 <%}%>
       `),
       js:_.template(`
 /**
- * VIEW <%=id%>
+ * VIEW <%=vid%>
  * @param  {[type]} $ [description]
  * @return {[type]}   [description]
  */
 ;(function(){
-  App.<%=id%>View.wrap({
+  App.<%=vid%>View.wrap({
     beforeRender:function(){
       //TODO
       return true;
@@ -96,11 +95,20 @@ App.registView("<%=views[i].id%>",new App.View({
           home:false
         },view.attribs);
 
-        viewsAttrs.views.push(attrs);
+
 
         var html = "src/html/view/"+attrs.id+".html";
         var js = "src/js/view/"+attrs.id+".js";
 
+        var tmp  = attrs.id.split("/");
+        attrs.vid = tmp[0];
+        tmp.forEach(function (view, index) {
+          if(index>0){
+            attrs.vid+=(view[0].toUpperCase()+view.substring(1))
+          }
+        });
+
+        viewsAttrs.views.push(attrs);
         if(!_.exists(html)||options.override){
            _.writeFileSync(html,tpl.view(attrs));
            _.log("生成视图(html):"+attrs.id);
@@ -119,9 +127,9 @@ App.registView("<%=views[i].id%>",new App.View({
     })
   });
 
-  if(options.withDoc){
-    //创建文档目录
-    var initRoot = 'src/doc';
-    Book.init(initRoot);
-  }
+  // if(options.withDoc){
+  //   //创建文档目录
+  //   var initRoot = 'src/doc';
+  //   Book.init(initRoot);
+  // }
 }

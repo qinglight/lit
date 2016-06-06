@@ -26,12 +26,6 @@
 			"desc":"工程的名字",
 			"type":"String",
 			"key":"name"
-		},
-		{
-			"op":"--with-doc",
-			"desc":"创建文档目录",
-			"type":"Boolean",
-			"key":"withDoc"
 		}
 	]
 }

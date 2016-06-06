@@ -9,13 +9,10 @@ exports.do = function(cmd,options) {
 		root:'wwwroot'
 	},options);
 
-	gulp.task('server',function () {
-    $.connect.server({
-      root: options.root,
-      livereload: true,
-      port: options.port
-    });
-  });
-
-  require('run-sequence')('server');
-}
+	$.connect.server({
+		root: options.root,
+		livereload: true,
+		port: options.port
+	});
+	return $.connect;
+};

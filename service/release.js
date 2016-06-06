@@ -1,8 +1,7 @@
 var jres = require('../kernel'),
-  _ = jres.util,
-  project,
-  lazypipe = require('lazypipe'),
-  gitbook = require('gitbook');
+    _ = jres.util,
+    project,
+    lazypipe = require('lazypipe');
 
 //gulp
 var gulp = require('gulp');
@@ -40,7 +39,7 @@ gulp.task('resources',function(){
   });
 
   return gulp.src("**/*",{cwd:app.src,ignore:ignore,nodir:true})
-    .pipe(gulp.dest(app.dist))
+      .pipe(gulp.dest(app.dist))
 });
 //-----------------------------------------
 
@@ -48,22 +47,22 @@ gulp.task('resources',function(){
 gulp.task('template',function(){
   _.log("编译js模板文件")
   return gulp.src([app.src+'/template/*.tpl'])
-    .pipe(require("../tools/template")())
-    .pipe(gulp.dest(app.tmp+"/template"))
+      .pipe(require("../tools/template")())
+      .pipe(gulp.dest(app.tmp+"/template"))
 });
 
 gulp.task('jade',function(){
   _.log("编译视图模板文件")
   return gulp.src([app.src+'/html/**/*.jade'])
-    .pipe($.jade())
-    .pipe(gulp.dest(app.tmp+"/html"))
+      .pipe($.jade())
+      .pipe(gulp.dest(app.tmp+"/html"))
 });
 
 gulp.task('less',function(){
   _.log("编译less样式文件")
   return gulp.src([app.src+'/css/**/*.less'])
-    .pipe($.less())
-    .pipe(gulp.dest(app.tmp+"/css"))
+      .pipe($.less())
+      .pipe(gulp.dest(app.tmp+"/css"))
 });
 
 gulp.task('coffee',function(){
@@ -85,18 +84,11 @@ gulp.task('images',function(){
 
 gulp.task('html',['jade'],function(){
   return gulp.src([app.src+'/html/page/*.html',app.tmp+'/html/page/*.html'])
-    .pipe(gulp.dest(app.tmp))
+      .pipe(gulp.dest(app.tmp))
 });
 //-----------------------------------------
 
 //-------------extra-----------------------
-gulp.task('pack',function () {
-  _.log("打包资源为发布包");
-  return gulp.src("dist/**")
-    .pipe($.zip(project.project+'-'+project.version+'.zip'))
-    .pipe(gulp.dest('.'));
-});
-
 gulp.task('brower',function () {
   _.log("打开浏览器,开启服务监听");
   $.connect.server({
@@ -113,30 +105,43 @@ gulp.task('reload', function (cb) {
 });
 
 
-gulp.task('gitbook', function (cb) {
-  _.log("正在编译生成文档！");
-  var book = new gitbook.Book(app.src+"/doc/", {
-    "config": {
-      "output": app.dist+"/doc/",
-      "theme": require("path").resolve(__dirname,"../tools/themes/theme"),
-      "plugins": [
-        "-highlight",
-        "-search",
-        "-sharing",
-        "-font-settings",
-        "-livereload"
-      ]
-    }
-  });
-  book.parse().then(function(){
-    return book.generate("website");
-  }).then(function(){
-    cb();
-  });
-});
+/*gulp.task('gitbook', function (cb) {
+ _.log("正在编译生成文档！");
+ var book = new gitbook.Book(app.src+"/doc/", {
+ "config": {
+ "output": app.dist+"/doc/",
+ "theme": require("path").resolve(__dirname,"../tools/themes/theme"),
+ "plugins": [
+ "-highlight",
+ "-search",
+ "-sharing",
+ "-font-settings",
+ "-livereload"
+ ]
+ }
+ });
+ book.parse().then(function(){
+ return book.generate("website");
+ }).then(function(){
+ cb();
+ });
+ });*/
 //-----------------------------------------
 
 exports.do = function(cmd,options) {
+  gulp.task('pack',function () {
+    _.log("打包资源为发布包");
+    var packdir = ".";
+    if(typeof options.pack=="string"){
+      packdir = options.pack;
+    }
+
+    return gulp.src("dist/**")
+        .pipe($.zip(project.project+'-'+project.version+'.zip'))
+        .pipe(gulp.dest(packdir));
+  });
+
+
   project = _.exists(process.cwd()+'/project.json')?require(process.cwd()+'/project.json'):{}
 
   if(options.product){
@@ -150,22 +155,22 @@ exports.do = function(cmd,options) {
     _.log("准备资源处理...");
 
     return gulp.src([app.tmp+"/*.html"])
-      .pipe(require("../tools/assemble")({type:project.type||"light"}))
-      .pipe(require("../tools/useref")({noconcat:!options.concat}))
-      .pipe($.if(function(file){
-        return options.uglify&&file.extname&&file.extname==".js";
-      },$.uglify()))
-      .pipe($.if(function(file){
-        return options.uglify&&file.extname&&file.extname==".css";
-      },$.minifyCss({cache: true})))
-      .pipe($.if(function(file){
-        return options.suffix&&file.extname&&file.extname!=".html";
-      },$.rev()))
-      .pipe($.revReplace())
-      .pipe(gulp.dest(app.dist));
+        .pipe(require("../tools/assemble")({type:project.type||"light"}))
+        .pipe(require("../tools/useref")({noconcat:!options.concat}))
+        .pipe($.if(function(file){
+          return options.uglify&&file.extname&&file.extname==".js";
+        },$.uglify()))
+        .pipe($.if(function(file){
+          return options.uglify&&file.extname&&file.extname==".css";
+        },$.minifyCss({cache: true})))
+        .pipe($.if(function(file){
+          return options.suffix&&file.extname&&file.extname!=".html";
+        },$.rev()))
+        .pipe($.revReplace())
+        .pipe(gulp.dest(app.dist));
   });
   //-----------------------------------------
-  
+
   var tasks = ['clean:dist','release'];
 
   if(options.pack){
@@ -182,22 +187,34 @@ exports.do = function(cmd,options) {
 
   tasks.push('clean:tmp');
 
+  var watcher;
   if(options.watch){
     _.log("正在监听文件变化...");
+    var cwd = process.cwd();
     var  watchFunc = setTimeout(function(){},200);
-    var watcher = gulp.watch(process.cwd()+"/"+app.src+"/**/*", function(event){
+    watcher = gulp.watch(process.cwd()+"/"+app.src+"/**/*", function(event){
       _.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
       clearTimeout(watchFunc);
       watchFunc = setTimeout(function(){
+        process.chdir(cwd);
         runSequence.apply(null,tasks);
       },300)
     });
   }
 
+  gulp.task("callback",function (cb) {
+    if(options.callback){
+      options.callback.call(this,{
+        watcher:watcher
+      });
+    }
+    cb();
+  })
+
   if(options.brower){
-    runSequence.apply(null,_.concat(tasks,['brower','reload']));
+    runSequence.apply(null,_.concat(tasks,['brower','reload','callback']));
     tasks.push("reload");
   }else{
-    runSequence.apply(null,tasks);
+    runSequence.apply(null,_.concat(tasks,['callback']));
   }
 }
