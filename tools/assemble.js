@@ -7,8 +7,6 @@ var project = _.exists(process.cwd()+'/project.json')?require(process.cwd()+'/pr
 
 /**
  * 主要是组装html代码,引入模板和视图资源,包括组件的js个视图资源
- * @param  {[type]} options [description]
- * @return {[type]}         [description]
  */
 function assemble(options) {
 
@@ -24,7 +22,6 @@ function assemble(options) {
       recognizeSelfClosing:true
     });
 
-    //视图
     var views = $("view");
     var script = $("\n<script type='text/javascript'></script>");
     var filename = file.stem||file.basename.split("\.")[0];
@@ -43,15 +40,24 @@ function assemble(options) {
       }
     });
 
-    // if($("script[light-attr-type=regist]").length==0){
-    //   regist.appendTo($("body"));
-    // }
+    /**
+     * 处理视图
+     */
     _.forEach(views, function (view) {
       var attrs = view.attribs;
+
       if(project.type=="angular"){
-        _.exists(config.src+"/html/view/"+attrs.id+".html")?_.copyFileSync(config.src+"/html/view/"+attrs.id+".html",config.dist+"/html/view/"+attrs.id+".html"):_.copyFileSync(config.tmp+"/html/view/"+attrs.id+".html",config.dist+"/html/view/"+attrs.id+".html");
+        if(_.exists(config.tmp+"/html/view/"+attrs.id+".html")){
+          _.copyFileSync(config.tmp+"/html/view/"+attrs.id+".html",config.dist+"/html/view/"+attrs.id+".html")
+        }else{
+          _.log("请先运行light gen 生成基本代码 !")
+        }
       }else{
-        $(view).replaceWith(_.exists(config.src+"/html/view/"+attrs.id+".html")?_.readFileSync(config.src+"/html/view/"+attrs.id+".html"):_.readFileSync(config.tmp+"/html/view/"+attrs.id+".html"));
+        if(_.exists(config.tmp+"/html/view/"+attrs.id+".html")){
+          $(view).replaceWith(_.readFileSync(config.tmp+"/html/view/"+attrs.id+".html"))
+        }else{
+          _.log("请先运行light gen 生成基本代码 !")
+        }
       }
 
       var view_js = script.clone().attr("src","js/view/"+attrs.id+".js");
@@ -59,21 +65,33 @@ function assemble(options) {
     });
 
 
-    //组件
+    /**
+     * 处理组件
+     */
     var components = $("component");
     _.forEach(components, function (component) {
       var attrs = component.attribs;
-      $(component).replaceWith(_.exists(config.src+"/html/component/"+attrs.id+".html")?_.readFileSync(config.src+"/html/component/"+attrs.id+".html"):_.readFileSync(config.tmp+"/html/component/"+attrs.id+".html"));
+      if(_.exists(config.tmp+"/html/component/"+attrs.id+".html")){
+        $(component).replaceWith(_.readFileSync(config.tmp+"/html/component/"+attrs.id+".html"));
+      }else{
+        _.log("请先运行light gen 生成基本代码 !")
+      }
 
       var component_js = script.clone().attr("src","js/component/"+attrs.id+".js");
       $("script[light-attr-type=regist]").after(component_js);
     });
 
-    //代码片段
+    /**
+     * 处理代码片段
+     */
     var snippets = $("snippet");
     _.forEach(snippets, function (snippet) {
       var attrs = snippet.attribs;
-      $(snippet).replaceWith(_.exists(config.src+"/html/snippet/"+attrs.id+".html")?_.readFileSync(config.src+"/html/snippet/"+attrs.id+".html"):_.readFileSync(config.tmp+"/html/snippet/"+attrs.id+".html"));
+      if(_.exists(config.tmp+"/html/snippet/"+attrs.id+".html")){
+        $(snippet).replaceWith(_.readFileSync(config.tmp+"/html/snippet/"+attrs.id+".html"))
+      }else{
+        _.log("您引入的代码片段不存在请检查!")
+      }
     });
 
     file.contents = new Buffer($.html());

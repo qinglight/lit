@@ -50,6 +50,12 @@
 			"desc":"是否压缩图片",
 			"type":"Boolean",
 			"key":"minifyImage"
+		},
+		{
+			"op":"--cache-manifest",
+			"desc":"生成离线应用的cache-manifest文件",
+			"type":"Boolean",
+			"key":"cacheManifest"
 		}
 	]
 }

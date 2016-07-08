@@ -12,7 +12,7 @@ app = {
   dist:"dist",
   src:"src",
   tmp:".tmp"
-}
+};
 
 //--------------清除------------------------
 gulp.task('clean:tmp', function (cb) {
@@ -53,8 +53,10 @@ gulp.task('template',function(){
 
 gulp.task('jade',function(){
   _.log("编译视图模板文件")
-  return gulp.src([app.src+'/html/**/*.jade'])
-      .pipe($.jade())
+  return gulp.src([app.src+'/html/**/*'])
+      .pipe($.if(function (file) {
+        return file.path.endsWith("\.jade");
+      },$.jade()))
       .pipe(gulp.dest(app.tmp+"/html"))
 });
 
@@ -89,43 +91,22 @@ gulp.task('html',['jade'],function(){
 //-----------------------------------------
 
 //-------------extra-----------------------
-gulp.task('brower',function () {
-  _.log("打开浏览器,开启服务监听");
-  $.connect.server({
-    root: ['dist'],
-    livereload: true,
-    port: 3000
-  });
-  require('open')("http://localhost:3000");
-});
-
 gulp.task('reload', function (cb) {
   gulp.src(app.dist).pipe($.connect.reload());
   cb();
 });
 
-
-/*gulp.task('gitbook', function (cb) {
- _.log("正在编译生成文档！");
- var book = new gitbook.Book(app.src+"/doc/", {
- "config": {
- "output": app.dist+"/doc/",
- "theme": require("path").resolve(__dirname,"../tools/themes/theme"),
- "plugins": [
- "-highlight",
- "-search",
- "-sharing",
- "-font-settings",
- "-livereload"
- ]
- }
- });
- book.parse().then(function(){
- return book.generate("website");
- }).then(function(){
- cb();
- });
- });*/
+gulp.task('manifest', function(){
+  gulp.src(app.dist+"/**", { base: app.dist })
+      .pipe($.manifest({
+        hash: true,
+        preferOnline: true,
+        network: ['*'],
+        filename: 'app.manifest',
+        exclude: 'app.manifest'
+      }))
+      .pipe(gulp.dest(app.dist));
+});
 //-----------------------------------------
 
 exports.do = function(cmd,options) {
@@ -136,9 +117,23 @@ exports.do = function(cmd,options) {
       packdir = options.pack;
     }
 
+    //生成manifest,json的能力,每个文件的md5
+    _.writeFileSync(require("path").join(app.dist,"manifest.json"),JSON.stringify(project))
+
     return gulp.src("dist/**")
         .pipe($.zip(project.project+'-'+project.version+'.zip'))
         .pipe(gulp.dest(packdir));
+  });
+
+  gulp.task('brower',function () {
+    _.log("打开浏览器,开启服务监听");
+    var port = options.brower===true?3000:options.brower
+    $.connect.server({
+      root: ['dist'],
+      livereload: true,
+      port: port
+    });
+    require('open')("http://localhost:"+port);
   });
 
 
@@ -167,18 +162,20 @@ exports.do = function(cmd,options) {
           return options.suffix&&file.extname&&file.extname!=".html";
         },$.rev()))
         .pipe($.revReplace())
+        .pipe(gulp.dest(app.dist))
+        .pipe($.rev.manifest())
         .pipe(gulp.dest(app.dist));
   });
   //-----------------------------------------
 
   var tasks = ['clean:dist','release'];
 
-  if(options.pack){
-    tasks.push('pack');
+  if(options.cacheManifest){
+    tasks.push("manifest")
   }
 
-  if(options.doc){
-    tasks.push('gitbook');
+  if(options.pack){
+    tasks.push('pack');
   }
 
   if(options.minifyImage){

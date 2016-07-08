@@ -10,7 +10,7 @@ function template(options) {
       return cb(null, file);
     }
     if (file.isBuffer()) {
-      var name = file.path.split("/").pop().split("\.")[0];
+      var name = file.path.split(require("path").sep).pop().split("\.")[0];
       file.contents = new Buffer("App."+name+"Template="+_.template(file.contents).source);
       file.path = file.path.replace(/tpl$/i,"js");
     }

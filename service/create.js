@@ -120,30 +120,33 @@ exports.do = function(directory,options){
       function initProject(){
         var branch  = types[options.type||'light'];
 
-        scaffold.download('wyub/light-dev-demo@'+branch, function (err, temp_path) {
-          
-          scaffold.deliver(temp_path, directory, []);
+        // scaffold.download('wyub/light-dev-demo@'+branch, function (err, temp_path) {
+        //
+        //
+        // });
+        var ncp = require('ncp').ncp;
 
-          doReplace(directory+"/project.json",{
-            name:options.name,
-            desc:options.description
-          })
+        ncp.limit = 16;
 
-          doReplace(directory+'/src/html/page/index.html',{
-            name:options.name,
-            desc:options.description
+        _.del(directory,function () {
+          ncp(require("path").join(__dirname,"..","scaffold",options.type||'light'), directory, function (err) {
+
+            doReplace(directory+"/project.json",{
+              name:options.name,
+              version:options.version,
+              desc:options.description
+            });
+
+            doReplace(directory+'/src/html/page/index.html',{
+              name:options.name,
+              version:options.version,
+              desc:options.description
+            });
+
+            if(options.callback){
+              options.callback();
+            }
           });
-          
-          /*
-          if(options.withDoc){
-            //创建文档目录
-            var initRoot = path.resolve(directory, 'src/doc');
-            Book.init(initRoot);
-          }*/
-
-          if(options.callback){
-            options.callback();
-          }
         });
       }
     })
@@ -155,6 +158,7 @@ function doReplace(file,op){
 
   conetnt = conetnt.replace(/\$name\$/ig,op['name']);
   conetnt = conetnt.replace(/\$desc\$/ig,op['desc']);
+  conetnt = conetnt.replace(/\$version\$/ig,op['version']);
 
   _.writeFileSync(file,conetnt);
 }
