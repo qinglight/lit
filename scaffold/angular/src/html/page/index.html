@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="app">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+  <meta content="yes" name="apple-mobile-web-app-capable" />
+  <meta content="black" name="apple-mobile-web-app-status-bar-style" />
+  <meta content="telephone=no,email=no" name="format-detection" />
+  <link rel="apple-touch-icon-precomposed" href="favicon.png">
+  <link rel="shortcut icon" href="favicon.ico" />
+  <meta name="Keywords" content=""/>
+  <meta name="description" content=""/>
+
+  <!-- build:css css/style.css -->
+  <link rel="stylesheet" href="css/bootstrap.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- endbuild -->
+
+  <title></title>
+</head>
+<body>
+  <div ng-view class="animated fadeIn" >
+    <view id="light" home="true"/>
+  </div>
+  <script src="//light.hs.net/apps/base/js/angular.min.js"></script>
+  <script src="//light.hs.net/apps/base/js/angular-route.min.js"></script>
+
+  <!-- build:js js/app.js -->
+  <script src="js/api/api.js"></script>
+
+  <!-- inject:view -->
+  <!-- endinject -->
+
+  <!-- endbuild -->
+</body>
+</html>

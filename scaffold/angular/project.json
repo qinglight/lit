@@ -1,0 +1,6 @@
+{
+	"project":"$name$",
+	"version":"$version$",
+	"desc":"$desc$",
+	"type":"angular"
+}

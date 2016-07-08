@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<snippet id="header" />
+  <!-- build:css css/style.css -->
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/index.css" />
+  <!-- endbuild -->
+
+	<title>$name$-$desc$</title>
+</head>
+<body>
+  <div id="main">
+    <view id="$name$" home="true" />
+  </div>
+  <snippet id="footer" />
+</body>
+
+  <!-- build:js js/app.js -->
+  <script type="text/javascript" src="js/lib/zepto.js"></script>
+  <script type="text/javascript" src="js/lib/underscore.js"></script>
+  <script type="text/javascript" src="js/lib/backbone.js"></script>
+  <script type="text/javascript" src="js/lib/framework-mvc.js"></script>
+  <script type="text/javascript" src="js/lib/framework-tool.js"></script>
+  <!-- inject:view -->
+  <!-- endinject -->
+
+  <!-- endbuild -->
+
+  <script type="text/javascript">
+    App.start();
+  </script>
+</html>

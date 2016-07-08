@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="app">
+<head>
+  <snippet id="header" />
+  <link rel="stylesheet" href="//light.hs.net/apps/base/f7/css/framework7.ios.min.css">
+  
+  <!-- build:css css/style.css -->
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- endbuild -->
+  
+  <title>$name$-$desc$</title>
+</head>
+<body>
+  <div class="panel-overlay"></div>
+
+  <snippet id="left-panel" />
+  <snippet id="right-panel" />
+
+  <div class="views">
+    <div class="view view-main">
+    
+      <!-- 顶部导航栏-->
+      <snippet id="navbar" />
+
+      <div class="pages navbar-through toolbar-through">
+        <snippet id="index" />
+      </div>
+
+      <!-- 底部工具栏-->
+      <snippet id="toolbar" />      
+    </div>
+  </div>
+
+  <script type="text/javascript" src="//light.hs.net/apps/base/f7/js/framework7.min.js"></script>
+
+  <!-- build:js js/login.js -->
+  <script src="js/main.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/controller/about.js"></script>
+  <!-- endbuild -->
+</body>
+</html>
