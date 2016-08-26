@@ -1,135 +1,59 @@
 var jres = require('../kernel'),
-	_ = jres.util;
+    _ = jres.util,
+    cheerio = require('cheerio'),
+    path = require("path");
 
+//代码生成的业务逻辑，四种模板
+exports.do = function (cmd, options) {
+    var project = require(process.cwd() + '/project.json');
 
-exports.do = function(cmd,options) {
-  var project = require(process.cwd()+'/project.json')
-  var tpls = {
-    "light":{
-      view:_.template(`
-<div id="<%=vid%>" style="display:none;"></div>
-      `),
-      regist:_.template(`
-<%for(var i=0;i<views.length;i++){%>
-App.registView("<%=views[i].vid%>",new App.View({
-  el:"#<%=views[i].vid%>",
-  model:new App.Model()
-}),<%=views[i].home%>);
-<%}%>
-      `),
-      js:_.template(`
-/**
- * VIEW <%=vid%>
- * @param  {[type]} $ [description]
- * @return {[type]}   [description]
- */
-;(function(){
-  App.<%=vid%>View.wrap({
-    beforeRender:function(){
-      //TODO
-      return true;
-    },
-    ready:function(){
-      //TODO
-    },
-    afterUnRender:function(){
-    }
-  });
-})();
-      `)
-    },
-    "angular":{
-      view:_.template(`
-<div class="row" view="<%=id%>">
-    <div class="col-xs-12"></div>
-</div>
-      `),
-      regist:_.template(`
-;(function(){
-  var app = angular.module('app', ['ngRoute'])
-  app.config(function ($routeProvider){
-    $routeProvider
-    <%var home;%>
-    <%for(var i=0;i<views.length;i++){var view = views[i];%>
-      .when('/<%=view.id%>', {
-          controller: '<%=view.id%>',
-          templateUrl: 'html/view/<%=view.id%>.html'
-      })
-      <%if(view.home) home=view%>
-    <%}%>
-      .otherwise({
-          redirectTo: '/<%=view.id%>'
-      });
-  })
-  window.app = app;
-})();
-      `),
-      js:_.template(`
-;(function(){
-  app.controller('<%=id%>',function($scope,$http,API){
+    _.glob("src/html/page/*.html", function (err, result) {
+        _.forEach(result, function (page) {
+            var $ = cheerio.load(_.readFileSync(page), {
+                recognizeSelfClosing: true
+            });
 
-  });
-})();
-      `)
-    }
-  }
+            //每个页面都要生成视图和register文件
+            var template = require("./lib/"+(project.type||"light-0.1"));
 
-  var cheerio = require('cheerio');
-  _.glob("src/html/page/*.html",function(err,result){
-    _.forEach(result,function(page){
-      var tpl = tpls[project.type||"light"];
+            var views = $("view"),
+                components = $("component"),
+                register = "src/js/regist/" + path.parse(page).name + ".js";
 
-      var filename = page.split(new RegExp("[\\|/]")).pop().replace("\.html","");
-      var regist = "src/js/regist/"+filename+".js";
+            //每一次gen都要重新生成register文件
+            if(_.exists(register)) _.del(register);
 
-      var $ = cheerio.load(_.readFileSync(page),{
-        recognizeSelfClosing:true
-      })
-      var views = $("view");
-      var viewsAttrs = {
-        views:[]
-      };
-      _.forEach(views,function(view){
-        var attrs = _.merge({
-          async:false,
-          home:false
-        },view.attribs);
+            _.forEach(views, function (view) {
+                var attrs = _.merge({
+                    async: false,
+                    home: false,
+                    parent:null
+                }, view.attribs);
 
+                var html = "src/html/view/" + attrs.id + ".html";
+                var js = "src/js/view/" + attrs.id + ".js";
 
+                if (!_.exists(html) || options.override) {
+                    _.writeFileSync(html, template.html(attrs));
+                    _.log("生成视图(html):" + attrs.id);
+                } else {
+                    _.log("视图(html)" + attrs.id + "已经存在,跳过代码生成,如需要强制覆盖,请添加-o选项");
+                }
 
-        var html = "src/html/view/"+attrs.id+".html";
-        var js = "src/js/view/"+attrs.id+".js";
+                if (!_.exists(js) || options.override) {
+                    _.writeFileSync(js, template.js(attrs));
+                    _.log("生成视图(js):" + attrs.id);
+                } else {
+                    _.log("视图(js)" + attrs.id + "已经存在,跳过代码生成,如需要强制覆盖,请添加-o选项");
+                }
 
-        var tmp  = attrs.id.split("/");
-        attrs.vid = tmp[0];
-        tmp.forEach(function (view, index) {
-          if(index>0){
-            attrs.vid+=(view[0].toUpperCase()+view.substring(1))
-          }
-        });
-
-        viewsAttrs.views.push(attrs);
-        if(!_.exists(html)||options.override){
-           _.writeFileSync(html,tpl.view(attrs));
-           _.log("生成视图(html):"+attrs.id);
-        }else{
-          _.log("视图(html)"+attrs.id+"已经存在,跳过代码生成,如需要强制覆盖,请添加-o选项");
-        }
-
-        if(!_.exists(js)||options.override){
-          _.writeFileSync(js,tpl.js(attrs));
-          _.log("生成视图(js):"+attrs.id);
-        }else{
-          _.log("视图(js)"+attrs.id+"已经存在,跳过代码生成,如需要强制覆盖,请添加-o选项");
-        }
-      });
-      _.writeFileSync(regist,tpl.regist(viewsAttrs));
-    })
-  });
-
-  // if(options.withDoc){
-  //   //创建文档目录
-  //   var initRoot = 'src/doc';
-  //   Book.init(initRoot);
-  // }
-}
+                //追加register信息
+                if(!_.exists(register)) {
+                    _.writeFileSync(register, template.register(attrs));
+                }else{
+                    _.appendFileSync(register, template.register(attrs));
+                }
+            });
+        })
+    });
+};

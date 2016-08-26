@@ -1,164 +1,97 @@
 var jres = require('../kernel'),
-		_ = jres.util,
-		path = require('path');
+    _ = jres.util,
+    prompt = require("prompt"),
+    colors = require("colors"),
+    ncp = require('ncp').ncp;
 
-// var Book = require('gitbook').Book;
+prompt.message = colors.green("Lighting");
+prompt.delimiter = colors.green(":");
+ncp.limit = 16;
 
-var types = {
-  light:"scaffold",
-  angular:"scaffold-angularjs",
-  demo:"master",
-  f7:"scaffold-f7"
-}
+exports.do = function (directory, options) {
+    var properties = {
+        name: {
+            description: colors.red("您的工程名名字是什么?".bgWhite),
+            default: "light"
+        },
+        version: {
+            description: colors.green("您的工程版本是什么?".bgWhite),
+            default: "0.0.1"
+        },
+        description: {
+            description: colors.blue("请简单描述一下当前的工程?".bgWhite),
+            default: "Just For Fun"
+        }
+    };
 
-exports.do = function(directory,options){
-  options.name =  options.name || directory ;
+    //初始化信息
+    options.name = options.name || directory;
 
-	
-	var scaffold = new (require('fis-scaffold-kernel'))({
-    type: 'github',
-    log: {
-        writer: 'stdout',
-        level: 0 
+    //补全未填充属性
+    for (var k in properties) {
+        if (options[k]) {
+            delete properties[k];
+        }
     }
-  });
 
-  var Promise = require("bluebird");
-  var chain = Promise.resolve();
-  chain.then(function(){
-    return new Promise(function (resolve) {
-      //名字
-      if(!options.name){
-        scaffold.prompt([
-          {
-            description: '您的工程名名字是什么?',
-            default: 'light',
-            name:"name"
-          }
-        ], function (err, results) {
-          options.name = results.name;
-          resolve();
-        })
-      }else{
-        resolve();
-      };
-    })
-  }).then(function(){
-    return new Promise(function (resolve) {
-      //描述
-      if(!options.description){
-        scaffold.prompt([
-          {
-            description: '这个工程是干什么用的呢?',
-            default: 'just for fun',
-            name:"desc"
-          }
-        ], function (err, results) {
-          options.description = results.desc;
-          resolve()
-        })
-      }else{
-        resolve();
-      };
-    })
-  }).then(function(){
-    return new Promise(function (resolve) {
-      //描述
-      if(!options.version){
-        scaffold.prompt([
-          {
-            description: '需要指定一下版本号吗?',
-            default: '0.0.1',
-            name:"version"
-          }
-        ], function (err, results) {
-          options.version = results.version;
-          resolve()
-        })
-      }else{
-        resolve();
-      };
-    })
-  }).then(function(){
-    return new Promise(function (resolve) {
-      //类型
-      /*if(!options.type){
-        scaffold.prompt([
-          {
-            description: '您希望使用是么开发技术栈?',
-            default: 'light',
-            name:"type"
-          }
-        ], function (err, results) {
-          options.type = results.type;
-          resolve();
-        })
-      }else{
-        resolve();
-      };*/
-      resolve();
-    })
-  }).then(function(){
-    return new Promise(function (resolve) {
-      directory = directory || options.name;
-      if(_.exists(directory)&&!options.force){
-        scaffold.prompt([
-          {
-            description: directory+'目录已经存在,需要删除(不可撤销)后继续吗?',
-            default: 'N',
-            name:"moveon"
-          }
-        ], function (err, results) {
-          if(results.moveon!="N"){
-            initProject();
-          }
-        })
-      }else{
-        initProject();
-      }
+    prompt.get({
+        properties: properties
+    }, function (err, result) {
+        _.extend(options, result);
 
-      function initProject(){
-        var branch  = types[options.type||'light'];
 
-        // scaffold.download('wyub/light-dev-demo@'+branch, function (err, temp_path) {
-        //
-        //
-        // });
-        var ncp = require('ncp').ncp;
+        var projectCb = function () {
+            ncp(require("path").join(__dirname, "..", "scaffold", options.type || 'light'), options.name, function (err) {
 
-        ncp.limit = 16;
+                doReplace(options.name + "/project.json", {
+                    name: options.name,
+                    version: options.version,
+                    desc: options.description
+                });
 
-        _.del(directory,function () {
-          ncp(require("path").join(__dirname,"..","scaffold",options.type||'light'), directory, function (err) {
+                doReplace(options.name + '/src/html/page/index.html', {
+                    name: options.name,
+                    version: options.version,
+                    desc: options.description
+                });
 
-            doReplace(directory+"/project.json",{
-              name:options.name,
-              version:options.version,
-              desc:options.description
+                if (options.callback) {
+                    options.callback();
+                }
             });
+        };
 
-            doReplace(directory+'/src/html/page/index.html',{
-              name:options.name,
-              version:options.version,
-              desc:options.description
-            });
+        //目录已经存在，且非强制删除
+        if (_.exists(options.name) && !options.force) {
+            prompt.get({
+                properties: {
+                    del: {
+                        description: colors.red("指定目录已经存在，是否删除y/n（提示：删除后不可撤销）?".bgWhite),
+                        default: "n"
+                    }
+                }
+            }, function (err, r) {
+                if (r.del != "y" && r.del != "Y") {
+                    _.log("指定目录已经存在，创建无法继续，请更话目录后重试！");
+                    return;
+                }
 
-            if(options.callback){
-              options.callback();
-            }
-          });
-        });
-      }
-    })
-  })
-}
+                _.del(options.name, function () {
+                    projectCb();
+                });
+            })
+        }else {
+            projectCb();
+        }
+    });
+};
 
-function doReplace(file,op){
-  var conetnt = _.readFileSync(file);
+function doReplace(file, op) {
+    var conetnt = _.readFileSync(file);
 
-  conetnt = conetnt.replace(/\$name\$/ig,op['name']);
-  conetnt = conetnt.replace(/\$desc\$/ig,op['desc']);
-  conetnt = conetnt.replace(/\$version\$/ig,op['version']);
+    conetnt = conetnt.replace(/\$name\$/ig, op['name']);
+    conetnt = conetnt.replace(/\$desc\$/ig, op['desc']);
+    conetnt = conetnt.replace(/\$version\$/ig, op['version']);
 
-  _.writeFileSync(file,conetnt);
-}
+    _.writeFileSync(file, conetnt);
+};

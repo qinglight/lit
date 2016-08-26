@@ -43,8 +43,10 @@ function assemble(options) {
     /**
      * 处理视图
      */
+    var parent_child_map = {};
     _.forEach(views, function (view) {
       var attrs = view.attribs;
+      parent_child_map[attrs.id] = attrs;
 
       if(project.type=="angular"){
         if(_.exists(config.tmp+"/html/view/"+attrs.id+".html")){
@@ -62,6 +64,12 @@ function assemble(options) {
 
       var view_js = script.clone().attr("src","js/view/"+attrs.id+".js");
       $("script[light-attr-type=regist]").after(view_js);
+    });
+
+    _.each(parent_child_map,function (v,k) {
+      if(v.parent){
+        $("#"+_.camel(v.parent)).find("sub-view").append($("#"+_.camel(k)))
+      }
     });
 
 
