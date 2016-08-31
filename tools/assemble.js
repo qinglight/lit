@@ -68,7 +68,7 @@ function assemble(options) {
 
     _.each(parent_child_map,function (v,k) {
       if(v.parent){
-        $("#"+_.camel(v.parent)).find("sub-view").append($("#"+_.camel(k)))
+        $("#"+_.camel(v.parent)).find("sub-view").first().append($("#"+_.camel(k)))
       }
     });
 
