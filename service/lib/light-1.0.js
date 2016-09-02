@@ -8,9 +8,12 @@ var html = `
 var js = `
 ;(function(){
   App.defineView("#<%=camel(id,'/')%>",{
-        beforeRender:function () {
-        }
-    });
+     model:new App.Model({
+        data:{}
+     }),
+     beforeRender:function () {
+     }
+  });
 })();
 `;
 
@@ -19,7 +22,8 @@ App.registerView({
     path:"/<%=id%>",
     el:"#<%=camel(id,'/')%>",
     home:<%=home%><%if(parent){%>,
-    parent:"#<%=camel(parent,'/')%>"<%}%>
+    parent:"#<%=camel(parent,'/')%>"<%}%><%if(async){%>,
+    async:"<%=async%>"<%}%>
 });
 `;
 
