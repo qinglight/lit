@@ -1,50 +1,22 @@
-var jres={},
-    path = require('path');
+var color = require('colors');
+var light = {};
 
-require('colors');
+light.util = require('./util');
+light.config = require('./config');
+light.commander = require('commander');
 
-jres.util=require('./util');
-jres.config=require('./config');
+['create', 'gen', 'release', 'server'].forEach(function (cmd) {
+    var cmdDetail = require('../command/' + cmd);
+    var command = light.commander
+        .command(cmdDetail.command)
+        .usage(cmdDetail.usage)
+        .description(cmdDetail.description)
+        .action(require("../service/"+cmd).do);
 
-jres.commander = require('commander');
+    cmdDetail.option.forEach(function (option) {
+        command.option(option.op, option.desc);
+    })
+});
 
-jres.require=function(){
-  var argv = Array.prototype.slice.call(arguments, 0),
-    name = argv.join('-');
 
-  if(argv[0] === 'command'){
-      var com = registeCmd(argv[1]);
-      return com;
-      jres.log("can't find command "+argv[1],"error");
-      process.exit(1);
-  }
-};
-
-function registeCmd(cmd){
-  var commander = jres.commander,
-    options = require('../command/'+cmd),
-    command = commander.command(options.command)
-               .usage(options.usage)
-               .description(options.description),
-    option = options.option,
-    action = require('../service/'+cmd).do,
-    keys = [];
-
-    for (var i = 0; i < option.length; i++) {
-      command.option(option[i].op,option[i].desc,option.type);
-      keys.push(option[i].key);
-    }
-
-    command.action(function(argv){
-      var _config = Array.prototype.slice.call(arguments).pop();
-      _config = jres.util.pick(_config,keys);
-      for(var key in _config){
-        if(typeof _config[key] == "function"){
-          _config[key] = null;
-        }
-      }
-      action.call(this,argv,_config);
-    });
-};
-
-module.exports=jres;
+module.exports = light;

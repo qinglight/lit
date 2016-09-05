@@ -1,32 +1,45 @@
-var log4js = require('log4js'),
-    lodash = require('lodash'),
-    fs = require('fs-utils'),
-    _ = {};
+var lodash = require('lodash'),
+    _ = {},
+    fs = require('fs-extra'),
+    path = require("path");
 
-log4js.loadAppender('console');
-
-var logger = log4js.getLogger('light');
-logger.setLevel('debug');
-
-lodash.merge(_,require("fs"));
-
-lodash.merge(_,lodash,fs);
-
-lodash.merge(_,{
-    log:function(msg,level){
-        level=level||'info';
-        logger[level](msg)
-    }
-});
-
-_.camel = function(str,split) {
-    split = split||"/";
+_.camel = function (str, split) {
+    split = split || "/";
     var d = str.split(split);
     str = d[0];
-    for(i=1;i<d.length;i++){
-        str+=d[i][0].toUpperCase()+d[i].substring(1)
+    for (i = 1; i < d.length; i++) {
+        str += d[i][0].toUpperCase() + d[i].substring(1)
     }
     return str;
-}
+};
 
-module.exports=_;
+lodash.extend(_,lodash);
+
+Date.prototype.Format = function (fmt) { //author: meizz
+    var o = {
+        "M+": this.getMonth() + 1,                 //月份
+        "d+": this.getDate(),                    //日
+        "h+": this.getHours(),                   //小时
+        "m+": this.getMinutes(),                 //分
+        "s+": this.getSeconds(),                 //秒
+        "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+        "S": this.getMilliseconds()             //毫秒
+    };
+    if (/(y+)/.test(fmt))
+        fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (var k in o)
+        if (new RegExp("(" + k + ")").test(fmt))
+            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    return fmt;
+};
+
+_.log = function (level, ...argv) {
+    argv[0] = ("\n"+new Date().Format("[yyyy-MM-dd hh:mm:ss]")+argv[0]).blue;
+    console[level].apply(this,argv);
+};
+
+lodash.extend(_,fs);
+
+_.join = path.join;
+
+module.exports = _;

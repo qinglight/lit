@@ -4,28 +4,24 @@
 	"description":"初始化工程目录结构",
 	"option":[
 		{
-			"op":"-t --type <type>",
-			"desc":"需要创建的工程类型，默认为单页web工程（mobile）",
-			"type":"String",
-			"key":"type"
+			"op":"-t,--type <type>",
+			"desc":"需要创建的工程类型，默认为单页web工程（mobile）"
 		},
 		{
-			"op":"-d --description <description>",
-			"desc":"工程的描述信息",
-			"type":"String",
-			"key":"description"
+			"op":"-d,--description <description>",
+			"desc":"工程的描述信息"
 		},
 		{
-			"op":"-v --version <version>",
-			"desc":"创建的工程的版本信息",
-			"type":"String",
-			"key":"version"
+			"op":"-v,--version <version>",
+			"desc":"创建的工程的版本信息"
 		},
 		{
-			"op":"-n --name <name>",
-			"desc":"工程的名字",
-			"type":"String",
-			"key":"name"
+			"op":"-n,--name <name>",
+			"desc":"工程的名字"
+		},
+		{
+			"op":"--force",
+			"desc":"是否强制清除已经存在的目录"
 		}
 	]
 }

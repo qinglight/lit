@@ -46,18 +46,8 @@ function main(argv){
 	}else if(cmdArg === '-h' || cmdArg=== '--help'){
 		help();
 	}else{
-		light.require('command',cmdArg);
 		light.commander.parse(argv);
 	}
 }
 
 module.exports.run=main;
-module.exports.light=light;
-module.exports.api= function (cwd,cmd, options,logger) {
-	if(logger){
-		light.util.log=logger;
-	}
-	var action = require("./service/"+cmd).do;
-	process.chdir(cwd);
-	return action(null,options);
-};
