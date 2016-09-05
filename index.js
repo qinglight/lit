@@ -11,7 +11,6 @@ var lighting_str = `
 
 `;
 
-require('colors');
 function version(){
 	console.log();
 	console.log("v"+require("./package.json").version);

@@ -1,6 +1,8 @@
 var jres={},
     path = require('path');
 
+require('colors');
+
 jres.util=require('./util');
 jres.config=require('./config');
 
