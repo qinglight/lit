@@ -12,25 +12,25 @@ var lighting_str = `
 
 `;
 
-require('colors')
+require('colors');
 function version(){
-	console.log()
+	console.log();
 	console.log("v"+require("./package.json").version);
-	console.log()
+	console.log();
 	console.log(lighting_str);
 }
 
 function help() {
-	console.log()
+	console.log();
 	console.log('useage:' + 'light'.yellow + ' <command> ');
-	console.log()
+	console.log();
 	console.log('commands:'.green);
 	console.log('  create\tcreate the project');
 	console.log('  gen\t\tgenerate the code of component and view');
 	console.log('  release\tbuild and deploy your project');
 	console.log('  server\tlaunch a static server');
 
-	console.log()
+	console.log();
 	console.log('please use "light <command> -h" to check the help info;');
 
 	console.log(lighting_str);
