@@ -16,7 +16,7 @@ jres.require=function(){
       jres.log("can't find command "+argv[1],"error");
       process.exit(1);
   }
-}
+};
 
 function registeCmd(cmd){
   var commander = jres.commander,
@@ -31,7 +31,7 @@ function registeCmd(cmd){
     for (var i = 0; i < option.length; i++) {
       command.option(option[i].op,option[i].desc,option.type);
       keys.push(option[i].key);
-    };
+    }
 
     command.action(function(argv){
       var _config = Array.prototype.slice.call(arguments).pop();
