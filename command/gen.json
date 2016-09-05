@@ -8,12 +8,6 @@
 			"desc":"代码生成的策略，默认当文件存在的时候不覆盖，当配置此参数后覆盖原代码",
 			"type":"Boolean",
 			"key":"override"
-		},
-		{
-			"op":"--with-doc",
-			"desc":"根据SUMMARY.MD生成章节结构",
-			"type":"Boolean",
-			"key":"withDoc"
 		}
 	]
 }
