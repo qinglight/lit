@@ -1,5 +1,4 @@
 var light = require('./kernel');
-var art = require('ascii-art');
 var lighting_str = `
  _  _         _      _    _               
 | |(_)       | |    | |  (_)              
@@ -22,13 +21,13 @@ function version(){
 
 function help() {
 	console.log();
-	console.log('useage:' + 'light'.yellow + ' <command> ');
+	console.log('useage:' + 'light'.yellow + ' <command> [option]');
 	console.log();
 	console.log('commands:'.green);
-	console.log('  create\tcreate the project');
-	console.log('  gen\t\tgenerate the code of component and view');
-	console.log('  release\tbuild and deploy your project');
-	console.log('  server\tlaunch a static server');
+	console.log('  create\t生成工程的基本目录结构和模板文件');
+	console.log('  gen\t\t代码生成');
+	console.log('  release\t代码的集成打包');
+	console.log('  server\t内置HTTP服务器');
 
 	console.log();
 	console.log('please use "light <command> -h" to check the help info;');
