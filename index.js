@@ -1,19 +1,28 @@
 var light = require('./kernel');
 var art = require('ascii-art');
-	
+var lighting_str = `
+ _  _         _      _    _               
+| |(_)       | |    | |  (_)              
+| | _   __ _ | |__  | |_  _  _ __    __ _ 
+| || | / _\` || '_ \\ | __|| || '_ \\  / _\` |
+| || || (_| || | | || |_ | || | | || (_| |
+|_||_| \\__, ||_| |_| \\__||_||_| |_| \\__, |
+        __/ |                        __/ |
+       |___/                        |___/ 
+
+`;
+
 require('colors')
 function version(){
 	console.log()
 	console.log("v"+require("./package.json").version);
 	console.log()
-	art.font('lighting', 'Doom', function(rendered){
-	    console.log(art.style(rendered, ''));
-	});
+	console.log(lighting_str);
 }
 
-function help(){
+function help() {
 	console.log()
-	console.log('useage:'+'light'.yellow+' <command> ');
+	console.log('useage:' + 'light'.yellow + ' <command> ');
 	console.log()
 	console.log('commands:'.green);
 	console.log('  create\tcreate the project');
@@ -23,9 +32,8 @@ function help(){
 
 	console.log()
 	console.log('please use "light <command> -h" to check the help info;');
-	art.font('lighting', 'Doom', function(rendered){
-	    console.log(art.style(rendered, ''));
-	});
+
+	console.log(lighting_str);
 }
 function main(argv){
 

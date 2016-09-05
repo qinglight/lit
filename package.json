@@ -4,7 +4,6 @@
   "description": "恒生移动web应用平台（Light）快速开发集成工具箱",
   "main": "index.js",
   "dependencies": {
-    "ascii-art": "0.0.2-alpha",
     "cheerio": "^0.20.0",
     "colors": "^1.1.2",
     "commander": "^2.6.0",
