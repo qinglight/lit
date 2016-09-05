@@ -1,7 +1,8 @@
 var lodash = require('lodash'),
     _ = {},
     fs = require('fs-extra'),
-    path = require("path");
+    path = require("path"),
+    glob = require("glob");
 
 _.camel = function (str, split) {
     split = split || "/";
@@ -34,12 +35,14 @@ Date.prototype.Format = function (fmt) { //author: meizz
 };
 
 _.log = function (level, ...argv) {
-    argv[0] = ("\n"+new Date().Format("[yyyy-MM-dd hh:mm:ss]")+argv[0]).blue;
+    argv[0] = (new Date().Format("[yyyy-MM-dd hh:mm:ss]")+argv[0]).blue;
     console[level].apply(this,argv);
 };
 
 lodash.extend(_,fs);
 
 _.join = path.join;
+_.parse = path.parse;
+_.glob = glob;
 
 module.exports = _;
