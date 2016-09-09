@@ -130,8 +130,10 @@ exports.do = function (cmd, options) {
         var port = options.brower === true ? 3000 : options.brower
         $.connect.server({
             root: ['dist'],
-            livereload: true,
-            port: port
+            port: port,
+            livereload:{
+                port:Math.floor(Math.random()*10000+10000)
+            }
         });
         require('open')("http://localhost:" + port);
     });
