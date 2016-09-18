@@ -4,6 +4,7 @@ var cheerio = require("cheerio"),
     useref = require('useref'),
     io = require('socket.io'),
     UglifyJS = require('uglify-js'),
+    archiver = require('archiver'),
     watch=false;
 
 /**
@@ -142,6 +143,14 @@ var task = function (options) {
         _.writeFileSync(file,userefParse[0]);
     });
 
+    /**
+     * 5. 将资源文件打包成zip包
+     */
+    if(options.pack){
+        var project = require(process.cwd()+'/project.json');
+        zipDir("dist",project.project+"-"+project.version+".zip");
+    }
+
     //-----------------------------我是检查分割线--------------------------------------------------
     if(watch) return;
     else watch = true;
@@ -186,5 +195,32 @@ var task = function (options) {
         });
     }
 };
+
+
+function zipDir(dir,dist) {
+    var _ = require("../kernel").util;
+    _.remove(dist,function () {
+        var output = _.createWriteStream(dist);
+        var archive = archiver('zip');
+
+        output.on('close', function() {
+            _.log("info",archive.pointer() + ' total bytes');
+            _.log("info",'archiver has been finalized and the output file descriptor has closed.');
+        });
+
+        archive.on('error', function(err) {
+            throw err;
+        });
+
+        archive.pipe(output);
+
+        var files = _.glob.sync(dir+"/**/*");
+        files.forEach(function (file) {
+            if(_.statSync(file).isFile()) archive.append(_.createReadStream(file), { name: file.replace(dir+"/","") })
+        });
+
+        archive.finalize();
+    });
+}
 
 exports.do = task;
