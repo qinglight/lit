@@ -1,7 +1,7 @@
 var jres = require('../kernel'),
-	_ = jres.util,
-	gulp = require('gulp'),
-	$ = require('gulp-load-plugins')();
+	_ = jres.util;
+	// gulp = require('gulp'),
+	// $ = require('gulp-load-plugins')();
 
 exports.do = function(cmd,options) {
 	options = _.merge({

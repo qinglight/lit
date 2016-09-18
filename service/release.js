@@ -1,8 +1,5 @@
 var cheerio = require("cheerio"),
     express = require("express"),
-    lr = require("tiny-lr"),
-    http = require('http'),
-    serveStatic = require("serve-static"),
     chokidar = require('chokidar'),
     watch=false;
 
@@ -93,6 +90,8 @@ var task = function (options) {
         _.writeFileSync(file,$.html());
     });
 
+
+    //-----------------------------我是检查分割线--------------------------------------------------
     if(watch){
         return;
     }
@@ -100,11 +99,11 @@ var task = function (options) {
     /**
      * 4. 开启server
      */
-    var app = connect();
-    app.use(lr.middleware({ app: app }));
-    app.use(serveStatic('dist', {'index': ['index.html']}));
-    http.createServer(app).listen(3000);
-
+    var app = express();
+    app.use(express.static('dist'));
+    app.listen(3000, function () {
+        _.log("info","HTTP服务正常启动");
+    });
 
     /**
      * 5. 开启watch
