@@ -11,6 +11,14 @@ var cheerio = require("cheerio"),
  * @param options
  */
 var task = function (options) {
+
+    if(options.product){
+        options.suffix = true;
+        options.uglify = true;
+        options.concat = true;
+    }
+
+
     var _  = require("../kernel").util;
 
     //1. 先要让应用可跑，然后增加新特性
