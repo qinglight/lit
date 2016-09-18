@@ -96,37 +96,39 @@ var task = function (options) {
         /**
          * 4. 代码的合并，优化，压缩
          */
-        var userefParse = useref(content.replace(/\r\n/ig,"\n"));//useref只认识LF的bug，需要再次转换一下分页符号
+        var userefParse = useref(content.replace(/\r\n/ig,"\n"),{noconcat:!(options.concat||options.uglify)});//useref只认识LF的bug，需要再次转换一下分页符号
         var result = userefParse[1];
 
-        var js = result.js;
-        for(var dist_js in js){
-            var dist_js_content = "";
-            var res = js[dist_js].assets;
-            res.forEach(function (r) {
-                dist_js_content += _.readFileSync(_.join("dist",r)).toString()+"\n";
-            });
+        if(options.concat || options.uglify){
+            var js = result.js;
+            for(var dist_js in js){
+                var dist_js_content = "";
+                var res = js[dist_js].assets;
+                res.forEach(function (r) {
+                    dist_js_content += _.readFileSync(_.join("dist",r)).toString()+"\n";
+                });
 
-            if(options.uglify){
-                dist_js_content = UglifyJS.minify(dist_js_content,{fromString:true}).code;
+                if(options.uglify){
+                    dist_js_content = UglifyJS.minify(dist_js_content,{fromString:true}).code;
+                }
+
+                _.writeFileSync(_.join("dist",dist_js),dist_js_content);
             }
 
-            _.writeFileSync(_.join("dist",dist_js),dist_js_content);
-        }
+            var css = result.css;
+            for(var dist_css in css){
+                var dist_css_content = "";
+                var res = css[dist_css].assets;
+                res.forEach(function (r) {
+                    dist_css_content += _.readFileSync(_.join("dist",r)).toString();
+                });
 
-        var css = result.css;
-        for(var dist_css in css){
-            var dist_css_content = "";
-            var res = css[dist_css].assets;
-            res.forEach(function (r) {
-                dist_css_content += _.readFileSync(_.join("dist",r)).toString();
-            });
+                if(options.uglify){
+                    dist_css_content = dist_css_content.replace(/\s/ig,"");
+                }
 
-            if(options.uglify){
-                dist_css_content = dist_css_content.replace(/\s/ig,"");
+                _.writeFileSync(_.join("dist",dist_css),dist_css_content);
             }
-
-            _.writeFileSync(_.join("dist",dist_css),dist_css_content);
         }
 
         _.writeFileSync(file,userefParse[0]);
@@ -136,39 +138,45 @@ var task = function (options) {
     if(watch) return;
     else watch = true;
 
-    /**
-     * 4. 开启server
-     */
-    var app = express();
-    var server = require('http').Server(app);
-    var sockets = [];
-    app.get(["**/*\.html","/"],function (req, res) {
-        var path = req.path;
-        if(path=="/"){
-            path = "/index.html";
-        }
-        res.set('Content-Type', 'text/html');
-        var html = _.readFileSync(_.join("dist",path)).toString();
-        html+="<script src='http://cdn.socket.io/socket.io-1.4.5.js'></script>";
-        html+="<script>var socket = io();socket.on('reload', function (data) {console.log(data);location.reload()});</script>";
-        io((server)).on('connection', function (socket) {
-            sockets.push(socket);
-        });
-        res.send(html);
-        res.end();
-    });
-    app.use(express.static('dist'));
-    server.listen(3000);
 
-    /**
-     * 5. 开启watch
-     */
-    chokidar.watch('src', {ignored: /[\/\\]\./}).on('change', (event, path) => {
-        task(options);
-        sockets.forEach(function (sockets) {
-            sockets.emit('reload', true);
-        })
-    });
+    var sockets = [];
+    if(options.brower){
+        /**
+         * 4. 开启server
+         */
+        var app = express();
+        var server = require('http').Server(app);
+        app.get(["**/*\.html","/"],function (req, res) {
+            var path = req.path;
+            if(path=="/"){
+                path = "/index.html";
+            }
+            res.set('Content-Type', 'text/html');
+            var html = _.readFileSync(_.join("dist",path)).toString();
+            html+="<script src='http://cdn.socket.io/socket.io-1.4.5.js'></script>";
+            html+="<script>var socket = io();socket.on('reload', function (data) {console.log(data);location.reload()});</script>";
+            io((server)).on('connection', function (socket) {
+                sockets.push(socket);
+            });
+            res.send(html);
+            res.end();
+        });
+        app.use(express.static('dist'));
+        server.listen(3000);
+    }
+
+
+    if(options.watch){
+        /**
+         * 5. 开启watch
+         */
+        chokidar.watch('src', {ignored: /[\/\\]\./}).on('change', (event, path) => {
+            task(options);
+            sockets.forEach(function (sockets) {
+                sockets.emit('reload', true);
+            })
+        });
+    }
 };
 
 exports.do = task;
