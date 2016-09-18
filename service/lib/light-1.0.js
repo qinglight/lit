@@ -8,9 +8,8 @@ var html = `
 var js = `
 ;(function(){
   App.defineView("#<%=camel(id,'/')%>",{
-     model:new App.Model({
-        data:{}
-     }),
+     data:{
+     },
      beforeRender:function () {
      }
   });
