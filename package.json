@@ -18,7 +18,7 @@
     "useref": "^1.2.0"
   },
   "bin": {
-    "light": "bin/jres"
+    "light": "bin/light"
   },
   "engines": {
     "node": ">= 0.8.0"
