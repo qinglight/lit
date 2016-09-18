@@ -162,7 +162,7 @@ var task = function (options) {
             res.end();
         });
         app.use(express.static('dist'));
-        server.listen(3000);
+        server.listen(options.brower === true?3000:options.brower);
     }
 
 
