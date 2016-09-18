@@ -34,9 +34,9 @@ Date.prototype.Format = function (fmt) { //author: meizz
     return fmt;
 };
 
-_.log = function (level, ...argv) {
-    argv[0] = (new Date().Format("[yyyy-MM-dd hh:mm:ss] ")+argv[0]).blue;
-    console[level].apply(this,argv);
+_.log = function (level,info) {
+    info = (new Date().Format("[yyyy-MM-dd hh:mm:ss] ")+info).blue;
+    console[level].apply(this,[info]);
 };
 
 lodash.extend(_,fs);

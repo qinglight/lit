@@ -1,6 +1,7 @@
 var cheerio = require("cheerio"),
     express = require("express"),
     chokidar = require('chokidar'),
+    io = require('socket.io'),
     watch=false;
 
 /**
@@ -100,16 +101,34 @@ var task = function (options) {
      * 4. 开启server
      */
     var app = express();
-    app.use(express.static('dist'));
-    app.listen(3000, function () {
-        _.log("info","HTTP服务正常启动");
+    var server = require('http').Server(app);
+    var sockets = [];
+    app.get(["**/*\.html","/"],function (req, res) {
+        var path = req.path;
+        if(path=="/"){
+            path = "/index.html";
+        }
+        res.set('Content-Type', 'text/html');
+        var html = _.readFileSync(_.join("dist",path)).toString();
+        html+="<script src='http://cdn.socket.io/socket.io-1.4.5.js'></script>";
+        html+="<script>var socket = io();socket.on('reload', function (data) {console.log(data);location.reload()});</script>";
+        io((server)).on('connection', function (socket) {
+            sockets.push(socket);
+        });
+        res.send(html);
+        res.end();
     });
+    app.use(express.static('dist'));
+    server.listen(3000);
 
     /**
      * 5. 开启watch
      */
     chokidar.watch('src', {ignored: /[\/\\]\./}).on('change', (event, path) => {
         task(options);
+        sockets.forEach(function (sockets) {
+            sockets.emit('reload', true);
+        })
     });
     watch = true;
 };
