@@ -43,8 +43,7 @@ var task = function (options) {
     files.forEach(function (file) {
         var content = _.readFileSync(file).toString().replace(/\r\n/ig,"\n");//处理换行符
 
-        // 处理register.js,此js可有可无，不作强制性要求
-        content = content.replace(/<!--\s*inject:view\s*-->\s*<!--\s*endinject\s*-->/ig,"\n<script light-attr-type='regist' src='js/regist/"+_.parse(file).name+".js' ></script>");
+        var injectScript = [];
 
         var $ = cheerio.load(content,{
             recognizeSelfClosing:true
@@ -56,6 +55,7 @@ var task = function (options) {
         //处理dom节点间的父子关系
         var parent_child_map = {};
 
+        injectScript.push('js/regist/'+_.parse(file).name+'.js');
         views.each(function (i,view) {
             var attr = view.attribs;
 
@@ -71,7 +71,7 @@ var task = function (options) {
             var js = _.join("dist/js/view",attr.id+".js");
             if(_.existsSync(js) && !attr.async){
                 // 向inject:view区域添加script标签
-                $("[light-attr-type=regist]").after("\n<script src='js/view/"+attr.id+".js'></script>")
+                injectScript.push('js/view/'+attr.id+'.js');
             }
         });
 
@@ -100,6 +100,19 @@ var task = function (options) {
         });
 
         content = $.html();
+
+        // 处理脚本注入
+        var spiltedContent = content.split(/<!--\s*inject:view\s*-->\s*<!--\s*endinject\s*-->/ig);
+        if(spiltedContent.length > 2){
+            _.log("inject:view注解在每个页面只能有一个");
+            process.exit(-1);
+        }else if(spiltedContent.length == 2){
+            var scripts = [];
+            injectScript.forEach(function (script) {
+                scripts.push("<script src='"+script+"'></script>");
+            });
+            content = spiltedContent[0] + scripts.join("\n") + spiltedContent[1];
+        }
 
 
         /**
