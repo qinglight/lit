@@ -127,7 +127,6 @@ var task = function (options) {
         _.writeFileSync(file,userefParse[0]);
     });
 
-    process.exit(0)
     //-----------------------------我是检查分割线--------------------------------------------------
     if(watch) return;
     else watch = true;
