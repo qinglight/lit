@@ -3,6 +3,7 @@ var cheerio = require("cheerio"),
     chokidar = require('chokidar'),
     useref = require('useref'),
     io = require('socket.io'),
+    UglifyJS = require('uglify-js'),
     watch=false;
 
 /**
@@ -95,7 +96,7 @@ var task = function (options) {
         /**
          * 4. 代码的合并，优化，压缩
          */
-        var userefParse = useref(content);
+        var userefParse = useref(content.replace(/\r\n/ig,"\n"));//useref只认识LF的bug，需要再次转换一下分页符号
         var result = userefParse[1];
 
         var js = result.js;
@@ -103,8 +104,13 @@ var task = function (options) {
             var dist_js_content = "";
             var res = js[dist_js].assets;
             res.forEach(function (r) {
-                dist_js_content += _.readFileSync(_.join("dist",r)).toString();
+                dist_js_content += _.readFileSync(_.join("dist",r)).toString()+"\n";
             });
+
+            if(options.uglify){
+                dist_js_content = UglifyJS.minify(dist_js_content,{fromString:true}).code;
+            }
+
             _.writeFileSync(_.join("dist",dist_js),dist_js_content);
         }
 
@@ -121,6 +127,7 @@ var task = function (options) {
         _.writeFileSync(file,userefParse[0]);
     });
 
+    process.exit(0)
     //-----------------------------我是检查分割线--------------------------------------------------
     if(watch) return;
     else watch = true;
