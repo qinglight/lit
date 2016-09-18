@@ -1,7 +1,6 @@
-var jres = require('../kernel'),
-	_ = jres.util;
-	// gulp = require('gulp'),
-	// $ = require('gulp-load-plugins')();
+var light = require('../kernel'),
+	_ = light.util,
+	express = require("express");
 
 exports.do = function(cmd,options) {
 	options = _.merge({
@@ -9,10 +8,9 @@ exports.do = function(cmd,options) {
 		root:'wwwroot'
 	},options);
 
-	$.connect.server({
-		root: options.root,
-		livereload: true,
-		port: options.port
+	var app = express();
+	app.use(express.static(options.root));
+	app.listen(options.port,function () {
+		_.log("info","HTTP服务器正常启动")
 	});
-	return $.connect;
 };
