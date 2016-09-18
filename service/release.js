@@ -1,6 +1,7 @@
 var cheerio = require("cheerio"),
     express = require("express"),
     chokidar = require('chokidar'),
+    useref = require('useref'),
     io = require('socket.io'),
     watch=false;
 
@@ -88,14 +89,41 @@ var task = function (options) {
             }
         });
 
-        _.writeFileSync(file,$.html());
+        content = $.html();
+
+
+        /**
+         * 4. 代码的合并，优化，压缩
+         */
+        var result = useref(content)[1];
+
+        var js = result.js;
+        for(var dist_js in js){
+            var dist_js_content = "";
+            var res = js[dist_js].assets;
+            res.forEach(function (r) {
+                dist_js_content += _.readFileSync(_.join("dist",r)).toString();
+            });
+            _.writeFileSync(_.join("dist",dist_js),dist_js_content);
+        }
+
+        var css = result.css;
+        for(var dist_css in css){
+            var dist_css_content = "";
+            var res = js[dist_css].assets;
+            res.forEach(function (r) {
+                dist_css_content += _.readFileSync(_.join("dist",r)).toString();
+            });
+            _.writeFileSync(_.join("dist",dist_css),dist_css_content);
+        }
+
+        _.writeFileSync(file,content);
     });
 
 
     //-----------------------------我是检查分割线--------------------------------------------------
-    if(watch){
-        return;
-    }
+    if(watch) return;
+    else watch = true;
 
     /**
      * 4. 开启server
@@ -130,7 +158,6 @@ var task = function (options) {
             sockets.emit('reload', true);
         })
     });
-    watch = true;
 };
 
 exports.do = task;
