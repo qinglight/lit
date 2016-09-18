@@ -1,3 +1,5 @@
+var cheerio = require("cheerio");
+
 /**
  * release命令
  * @param options
@@ -9,19 +11,68 @@ exports.do = function (options) {
     _.removeSync("dist");
     _.copySync("src","dist");
 
+    /**
+     * 2. 搬迁所有的html/page下的文件到根目录
+     */
+    var files = _.glob.sync("dist/html/page/*");
+    files.forEach(function (file) {
+        var dist = _.join("dist",_.parse(file).base);
+        _.renameSync(file,dist);
+    });
 
-        _.glob("dist/html/page/*",function (err,files) {
-            files.forEach(function (file) {
-                var dist = _.join("dist",_.parse(file).base);
-                _.move(file,_.join("dist",_.parse(file).base),function () {
-                    new Promise(function (resolve, reject) {
-                        resolve(dist)
-                    }).then(function (data) {
+    /**
+     * 3. 组装视图->组件->snippet
+     */
+    //TODO: 只支持根目录下的一级目录
+    files = _.glob.sync("dist/*.html");
+    files.forEach(function (file) {
+        var content = _.readFileSync(file).toString().replace(/\r\n/ig,"\n");//处理换行符
 
+        // 处理register.js,此js可有可无，不作强制性要求
+        content = content.replace(/<!--\s*inject:view\s*-->\s*<!--\s*endinject\s*-->/ig,"\n<script light-attr-type='regist' src='js/regist/"+_.parse(file).name+".js' ></script>");
 
-                        console.log(data)
-                    });
-                })
-            })
+        var $ = cheerio.load(content,{
+            recognizeSelfClosing:true
         });
+
+        //-------------视图-----------------
+        var views = $("view");
+
+        //处理dom节点间的父子关系
+        var parent_child_map = {};
+
+        views.each(function (i,view) {
+            var attr = view.attribs;
+
+            //HTML
+            parent_child_map[attr.id] = attr;
+            var html = _.join("dist/html/view",attr.id+".html");
+            if(_.existsSync(html)){
+                $(view).replaceWith(_.readFileSync(html).toString());
+            }
+
+            //JS
+            //js要区分是否为异步视图
+            var js = _.join("dist/js/view",attr.id+".js");
+            if(_.existsSync(js) && !attr.async){
+                // 向inject:view区域添加script标签
+                $("[light-attr-type=regist]").after("\n<script src='js/view/"+attr.id+".js'></script>")
+            }
+        });
+
+        //处理dom节点间的父子关系
+        _.each(parent_child_map,function (v,k) {
+            if(v.parent){
+                // 当一个视图内包含多个sub-view的dom节点时,只有最靠近前面的一个生效
+                // 因为，当存在多级视图时，无法准确的知道组装顺序
+                $("#"+_.camel(v.parent)).find("sub-view").first().append($("#"+_.camel(k)))
+            }
+        });
+
+        //-------------组件-----------------
+        var components = $("component");
+
+        _.writeFileSync(file,$.html());
+    });
 };
+
