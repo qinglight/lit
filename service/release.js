@@ -95,7 +95,8 @@ var task = function (options) {
         /**
          * 4. 代码的合并，优化，压缩
          */
-        var result = useref(content)[1];
+        var userefParse = useref(content);
+        var result = userefParse[1];
 
         var js = result.js;
         for(var dist_js in js){
@@ -110,16 +111,15 @@ var task = function (options) {
         var css = result.css;
         for(var dist_css in css){
             var dist_css_content = "";
-            var res = js[dist_css].assets;
+            var res = css[dist_css].assets;
             res.forEach(function (r) {
                 dist_css_content += _.readFileSync(_.join("dist",r)).toString();
             });
             _.writeFileSync(_.join("dist",dist_css),dist_css_content);
         }
 
-        _.writeFileSync(file,content);
+        _.writeFileSync(file,userefParse[0]);
     });
-
 
     //-----------------------------我是检查分割线--------------------------------------------------
     if(watch) return;
