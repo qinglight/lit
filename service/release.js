@@ -121,6 +121,11 @@ var task = function (options) {
             res.forEach(function (r) {
                 dist_css_content += _.readFileSync(_.join("dist",r)).toString();
             });
+
+            if(options.uglify){
+                dist_css_content = dist_css_content.replace(/\s/ig,"");
+            }
+
             _.writeFileSync(_.join("dist",dist_css),dist_css_content);
         }
 
