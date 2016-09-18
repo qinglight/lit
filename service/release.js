@@ -1,10 +1,16 @@
-var cheerio = require("cheerio");
+var cheerio = require("cheerio"),
+    express = require("express"),
+    lr = require("tiny-lr"),
+    http = require('http'),
+    serveStatic = require("serve-static"),
+    chokidar = require('chokidar'),
+    watch=false;
 
 /**
  * release命令
  * @param options
  */
-exports.do = function (options) {
+var task = function (options) {
     var _  = require("../kernel").util;
 
     //1. 先要让应用可跑，然后增加新特性
@@ -72,7 +78,41 @@ exports.do = function (options) {
         //-------------组件-----------------
         var components = $("component");
 
+
+        //-------------片段-----------------
+        var snippets = $("snippet");
+        snippets.each(function (i,snippet) {
+            var attr = snippet.attribs;
+
+            var html = _.join("dist/html/snippet",attr.id+".html");
+            if(_.existsSync(html)){
+                $(snippet).replaceWith(_.readFileSync(html).toString());
+            }
+        });
+
         _.writeFileSync(file,$.html());
     });
+
+    if(watch){
+        return;
+    }
+
+    /**
+     * 4. 开启server
+     */
+    var app = connect();
+    app.use(lr.middleware({ app: app }));
+    app.use(serveStatic('dist', {'index': ['index.html']}));
+    http.createServer(app).listen(3000);
+
+
+    /**
+     * 5. 开启watch
+     */
+    chokidar.watch('src', {ignored: /[\/\\]\./}).on('change', (event, path) => {
+        task(options);
+    });
+    watch = true;
 };
 
+exports.do = task;
