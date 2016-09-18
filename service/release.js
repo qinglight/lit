@@ -107,6 +107,7 @@ var task = function (options) {
          */
         var userefParse = useref(content.replace(/\r\n/ig,"\n"),{noconcat:!(options.concat||options.uglify)});//useref只认识LF的bug，需要再次转换一下分页符号
         var result = userefParse[1];
+        content = userefParse[0];
 
         if(options.concat || options.uglify){
             var js = result.js;
@@ -140,11 +141,47 @@ var task = function (options) {
             }
         }
 
-        _.writeFileSync(file,userefParse[0]);
+
+        /**
+         * 5. 添加反缓存的后缀策略
+         */
+        $ = cheerio.load(content,{
+            recognizeSelfClosing:true
+        });
+
+        if(options.suffix){
+            //TODO:这里必须有一个对照表，在多个页面的资源已经重命名后提供对照
+            $("link").each(function (i, o) {
+                var src = o.attribs.href;
+                if(!/^(http:\/\/)|(https:\/\/)|(\/\/).*$/i.test(src)){
+                    if(_.existsSync("dist/"+src)){
+                        var tmp = /([^\/]{1,})\.css/i.exec(src);
+                        var dist = src.replace(/([^\/]{1,})\.js$/i,tmp[1]+"_"+new Date().getTime()+".css");
+                        _.renameSync("dist/"+src,"dist/"+dist);
+                        o.attribs.href = dist;
+                    }
+                }
+            });
+
+            $("script").each(function (i, o) {
+                var src = o.attribs.src;
+                if(!/^(http:\/\/)|(https:\/\/)|(\/\/).*$/i.test(src)){
+                    if(_.existsSync("dist/"+src)){
+                        var tmp = /([^\/]{1,})\.js$/i.exec(src);
+                        var dist = src.replace(/([^\/]{1,})\.js$/i,tmp[1]+"_"+new Date().getTime()+".js");
+                        _.renameSync("dist/"+src,"dist/"+dist);
+                        o.attribs.src = dist;
+                    }
+                }
+            });
+        }
+
+        _.writeFileSync(file,$.html());
     });
 
+
     /**
-     * 5. 将资源文件打包成zip包
+     * 6. 将资源文件打包成zip包
      */
     if(options.pack){
         var project = require(process.cwd()+'/project.json');
