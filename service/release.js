@@ -351,8 +351,8 @@ var task = function (options) {
                         }
                         res.set('Content-Type', 'text/html');
                         var html = _.readFileSync(_.join("dist",path)).toString();
-                        // html+="<script src='http://cdn.socket.io/socket.io-1.4.5.js'></script>";
-                        // html+="<script>var socket = io();socket.on('reload', function (data) {console.log(data);location.reload()});</script>";
+                        html+="<script src='http://cdn.socket.io/socket.io-1.4.5.js'></script>";
+                        html+="<script>var socket = io();socket.on('reload', function (data) {console.log(data);location.reload()});</script>";
                         io((server)).on('connection', function (socket) {
                             sockets.push(socket);
                         });
