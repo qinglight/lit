@@ -64,7 +64,10 @@ var task = function (options) {
     var light = require("../kernel"),
         _ = light.util;
 
-    readPlugins();
+    if(options.enablePlugins){
+        readPlugins();
+    }
+
     /**
      * 0. 准备
      */
