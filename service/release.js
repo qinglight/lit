@@ -163,7 +163,8 @@ var task = function (options) {
          */
         $ = cheerio.load(content,{
             recognizeSelfClosing:true,
-            decodeEntities: false
+            decodeEntities: false,
+            normalizeWhitespace: true,
         });
 
         if(options.suffix){
@@ -248,7 +249,7 @@ var task = function (options) {
             io((server)).on('connection', function (socket) {
                 sockets.push(socket);
             });
-            res.send(html);
+            res.send(new Buffer(html));
             res.end();
         });
         app.use(express.static('dist'));
