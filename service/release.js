@@ -79,6 +79,7 @@ var task = function (options) {
         });
 
         //处理dom节点间的父子关系
+        //TODO :父子关系这里有个大坑，视图的定义上必须是子视图vue先new，否则就完蛋了
         _.each(parent_child_map,function (v,k) {
             if(v.parent){
                 // 当一个视图内包含多个sub-view的dom节点时,只有最靠近前面的一个生效
@@ -102,7 +103,7 @@ var task = function (options) {
             }
         });
 
-        content = $.html();
+        content = $.html().replace(/sub\-view/ig,"div");
 
         // 处理脚本注入
         var spiltedContent = content.split(/<!--\s*inject:view\s*-->\s*<!--\s*endinject\s*-->/ig);
@@ -111,7 +112,8 @@ var task = function (options) {
             process.exit(-1);
         }else if(spiltedContent.length == 2){
             var scripts = [];
-            injectScript.forEach(function (script) {
+            scripts.push("<script type='text/javascript' src='"+injectScript.shift()+"'></script>");
+            injectScript.reverse().forEach(function (script) {
                 scripts.push("<script type='text/javascript' src='"+script+"'></script>");
             });
             content = spiltedContent[0] + scripts.join("\n") + spiltedContent[1];
