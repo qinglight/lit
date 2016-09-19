@@ -53,6 +53,7 @@ function callPlugin(stage,cb) {
             });
         }
     });
+    if(ava == 0) cb();
 }
 
 /**
@@ -384,7 +385,7 @@ var task = function (options) {
                     });
                 }
             }
-
+            _.log("info","lighting执行完毕")
             resolve();
         })
     }).catch(function (err) {
