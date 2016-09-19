@@ -48,7 +48,8 @@ var task = function (options) {
         var injectScript = [];
 
         var $ = cheerio.load(content,{
-            recognizeSelfClosing:true
+            recognizeSelfClosing:true,
+            decodeEntities: false
         });
 
         //-------------视图-----------------
@@ -111,7 +112,7 @@ var task = function (options) {
         }else if(spiltedContent.length == 2){
             var scripts = [];
             injectScript.forEach(function (script) {
-                scripts.push("<script type='application/javascript' src='"+script+"'></script>");
+                scripts.push("<script type='text/javascript' src='"+script+"'></script>");
             });
             content = spiltedContent[0] + scripts.join("\n") + spiltedContent[1];
         }
@@ -161,7 +162,8 @@ var task = function (options) {
          * 5. 添加反缓存的后缀策略
          */
         $ = cheerio.load(content,{
-            recognizeSelfClosing:true
+            recognizeSelfClosing:true,
+            decodeEntities: false
         });
 
         if(options.suffix){
