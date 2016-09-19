@@ -125,9 +125,10 @@ var task = function (options) {
                 var parent_child_map = {};
 
                 injectScript.push('js/regist/'+_.parse(file).name+'.js');
+                _.log("info","发现并开始处理视图");
                 views.each(function (i,view) {
                     var attr = view.attribs;
-                    _.log("info","发现并开始处理视图："+attr.id);
+                    // _.log("info","发现并开始处理视图："+attr.id);
 
                     //HTML
                     parent_child_map[attr.id] = attr;
@@ -157,9 +158,10 @@ var task = function (options) {
 
                 //-------------组件-----------------
                 var components = $("component");
+                _.log("info","发现并开始处理组件");
                 components.each(function (i,component) {
                     var attr = component.attribs;
-                    _.log("info","发现并开始处理组件："+attr.id);
+                    // _.log("info","发现并开始处理组件："+attr.id);
 
                     //HTML
                     var html = _.join("dist/html/component",attr.id+".html");
@@ -179,9 +181,10 @@ var task = function (options) {
 
                 //-------------片段-----------------
                 var snippets = $("snippet");
+                _.log("info","发现并开始处理代码片段");
                 snippets.each(function (i,snippet) {
                     var attr = snippet.attribs;
-                    _.log("info","发现并开始处理代码片段："+attr.id);
+                    // _.log("info","发现并开始处理代码片段："+attr.id);
 
                     var html = _.join("dist/html/snippet",attr.id+".html");
                     if(_.existsSync(html)){
@@ -260,6 +263,7 @@ var task = function (options) {
                 });
 
                 if(options.suffix){
+                    _.log("info","生成文件防缓存后缀");
                     $("link").each(function (i, o) {
                         var src = o.attribs.href;
                         if(src&&!/^(http:\/\/)|(https:\/\/)|(\/\/).*$/i.test(src)){
@@ -272,7 +276,7 @@ var task = function (options) {
                             }else{
                                 dist = src.replace(/([^\/]{1,})\.([^\.]{1,})$/i,tmp[1]+"_"+new Date().getTime()+"."+tmp[2]);
                                 if(_.existsSync("dist/"+src)){
-                                    _.log("info","为"+src+"生成文件后缀"+dist);
+                                    // _.log("info","为"+src+"生成文件后缀"+dist);
                                     _.renameSync("dist/"+src,"dist/"+dist);
                                 }
                             }
@@ -294,7 +298,7 @@ var task = function (options) {
                             }else{
                                 dist = src.replace(/([^\/]{1,})\.js$/i,tmp[1]+"_"+new Date().getTime()+".js");
                                 if(_.existsSync("dist/"+src)){
-                                    _.log("info","为"+src+"生成文件后缀"+dist);
+                                    // _.log("info","为"+src+"生成文件后缀"+dist);
                                     _.renameSync("dist/"+src,"dist/"+dist);
                                 }
                             }
