@@ -283,7 +283,7 @@ var task = function (options) {
         /**
          * 5. 开启watch
          */
-        chokidar.watch('src', {ignored: /[\/\\]\./}).on('change', (event, path) => {
+        chokidar.watch('src', {ignored: /[\/\\]\./}).on('change', function(event, path){
             task(options);
             sockets.forEach(function (sockets) {
                 sockets.emit('reload', true);
