@@ -5,6 +5,7 @@ var light = {},
 light.util = require('./util');
 light.config = require('./config');
 light.commander = require('commander');
+light.plugins = [];
 
 //插件初始化
 //要完善整个工具的完整的生命周期
@@ -26,11 +27,10 @@ if(_.existsSync(pluginsDir)){
 
     plugins.forEach(function (plugin) {
         plugin = require(plugin);
-        plugin.install(light);
+        if(plugin.install) plugin.install(light);//安装插件成功
+        light.plugins.push(plugin);
     })
 }
-
-
 
 ['create', 'gen', 'release', 'server', 'plugin'].forEach(function (cmd) {
     var cmdDetail = require('../command/' + cmd);
