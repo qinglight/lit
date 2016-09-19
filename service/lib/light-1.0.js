@@ -7,9 +7,13 @@ var html = `
 
 var js = `
 ;(function(){
-  App.defineView("#<%=camel(id,'/')%>",{
-     data:{
-     },
+  App.defineViewModel("#<%=camel(id,'/')%>",{
+       data:{
+         data:{},
+         watch:{},
+         methods:{}
+       },
+     },{
      beforeRender:function () {
      }
   });
