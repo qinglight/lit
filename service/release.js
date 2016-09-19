@@ -43,11 +43,11 @@ function callPlugin(stage,cb) {
         _ = light.util;
 
     if(plugins.length==0) return cb();
-    var ava = 0;
+    var ava = plugins.length;
+
     plugins.forEach(function (plugin) {
         if(plugin[stage] && typeof plugin[stage] == "function"){
             _.log("info","阶段："+stage+"，调用插件"+plugin.pluginName +"开始");
-            ava++;
             plugin[stage].call(plugin,light,function () {
                 _.log("info","阶段："+stage+"，调用插件"+plugin.pluginName +"成功");
                 ava--;
