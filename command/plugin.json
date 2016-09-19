@@ -1,0 +1,23 @@
+{
+	"command":"plugin [command]",
+	"usage":"[command]",
+	"description":"Lighting相关插件的搜索/更新/安装/移除",
+	"option":[
+		{
+			"op":"-a --add <name>",
+			"desc":"安装插件"
+		},
+		{
+			"op":"-d --delete <name>",
+			"desc":"卸载插件"
+		},
+		{
+			"op":"-u --update <name>",
+			"desc":"更新插件"
+		},
+		{
+			"op":"-s --search <name>",
+			"desc":"查询插件"
+		}
+	]
+}
