@@ -11,10 +11,9 @@ exports.do = function(cmd,options) {
 
 	if(options.add){
 		// 添加插件
-		child_process.exec("npm --registry=https://registry.npm.taobao.org install -d lighting-plugin-" + options.add, {
+		var stdout = child_process.execSync("npm --registry=https://registry.npm.taobao.org install -d lighting-plugin-" + options.add, {
 			cwd:pluginsDir
-		}, function (err, stdout) {
-			_.log("info",stdout)
-		})
+		});
+		_.log("info",stdout)
 	}
 };
