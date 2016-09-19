@@ -41,19 +41,23 @@ function readPlugins() {
 function callPlugin(stage,cb) {
     var light = require("../kernel"),
         _ = light.util;
+
+    if(plugins.length==0) return cb();
     var ava = 0;
     plugins.forEach(function (plugin) {
         if(plugin[stage] && typeof plugin[stage] == "function"){
             _.log("info","阶段："+stage+"，调用插件"+plugin.pluginName +"开始");
             ava++;
             plugin[stage].call(plugin,light,function () {
-                _.log("info","阶段："+stage+"，调用插件"+this.pluginName +"成功");
+                _.log("info","阶段："+stage+"，调用插件"+plugin.pluginName +"成功");
                 ava--;
                 if(ava==0) cb();
             });
+        }else{
+            ava--;
+            if(ava==0) cb();
         }
     });
-    if(ava == 0) cb();
 }
 
 /**
