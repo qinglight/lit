@@ -245,7 +245,7 @@ var task = function (options) {
 
                         if(options.uglify){
                             _.log("info","压缩并生成代码："+dist_css);
-                            dist_css_content = dist_css_content.replace(/\s/ig,"");
+                            dist_css_content = dist_css_content.replace(/\s{1,}/ig," ");
                         }
 
                         _.writeFileSync(_.join("dist",dist_css),dist_css_content);
