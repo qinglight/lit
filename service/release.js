@@ -206,8 +206,6 @@ var task = function (options) {
                     res_suffix_map[src] = dist;
                 }
             });
-
-            console.log(res_suffix_map)
             res_suffix_map = {};
         }
 
@@ -252,6 +250,11 @@ var task = function (options) {
         });
         app.use(express.static('dist'));
         server.listen(options.brower === true?3000:options.brower);
+
+        /**
+         * 打开浏览器
+         */
+        _.open("http://localhost:" + port);
     }
 
 
