@@ -13,8 +13,6 @@ light.commander = require('commander');
 var os = require("os");
 var pluginsDir = light.util.join(os.homedir(),".lighting-plugins");
 
-
-
 ['create', 'gen', 'release', 'server', 'plugin'].forEach(function (cmd) {
     var cmdDetail = require('../command/' + cmd);
     var command = light.commander
