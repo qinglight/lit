@@ -22,7 +22,8 @@ var task = function (options) {
     }
 
 
-    var _  = require("../kernel").util;
+    var light = require("../kernel"),
+        _  = light.util;
 
     //1. 先要让应用可跑，然后增加新特性
     _.removeSync("dist");
@@ -104,6 +105,11 @@ var task = function (options) {
         });
 
         content = $.html().replace(/sub\-view/ig,"div");
+
+        //生命周期阶段
+        light.plugins.forEach(function (plugin) {
+            if(plugin.prepare) plugin.prepare.call(null,light);
+        });
 
         // 处理脚本注入
         var spiltedContent = content.split(/<!--\s*inject:view\s*-->\s*<!--\s*endinject\s*-->/ig);
