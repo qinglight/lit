@@ -240,11 +240,11 @@ var task = function (options) {
                         var dist_css_content = "";
                         var res = css[dist_css].assets;
                         res.forEach(function (r) {
-                            _.log("info","压缩并生成代码："+dist_css);
                             dist_css_content += _.readFileSync(_.join("dist",r)).toString();
                         });
 
                         if(options.uglify){
+                            _.log("info","压缩并生成代码："+dist_css);
                             dist_css_content = dist_css_content.replace(/\s/ig,"");
                         }
 
