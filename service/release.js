@@ -7,6 +7,8 @@ var cheerio = require("cheerio"),
     archiver = require('archiver'),
     watch=false;
 
+var res_suffix_map = {};
+
 /**
  * release命令
  * @param options
@@ -163,30 +165,50 @@ var task = function (options) {
         });
 
         if(options.suffix){
-            //TODO:这里必须有一个对照表，在多个页面的资源已经重命名后提供对照
             $("link").each(function (i, o) {
                 var src = o.attribs.href;
-                if(!/^(http:\/\/)|(https:\/\/)|(\/\/).*$/i.test(src)){
-                    if(_.existsSync("dist/"+src)){
-                        var tmp = /([^\/]{1,})\.css/i.exec(src);
-                        var dist = src.replace(/([^\/]{1,})\.js$/i,tmp[1]+"_"+new Date().getTime()+".css");
-                        _.renameSync("dist/"+src,"dist/"+dist);
-                        o.attribs.href = dist;
+                if(src&&!/^(http:\/\/)|(https:\/\/)|(\/\/).*$/i.test(src)){
+
+                    var tmp = /([^\/]{1,})\.([^\.]{1,})$/i.exec(src);
+
+                    var dist = null;
+                    if(res_suffix_map[src]){
+                        dist = res_suffix_map[src];
+                    }else{
+                        dist = src.replace(/([^\/]{1,})\.([^\.]{1,})$/i,tmp[1]+"_"+new Date().getTime()+"."+tmp[2]);
+                        if(_.existsSync("dist/"+src)){
+                            _.renameSync("dist/"+src,"dist/"+dist);
+                        }
                     }
+
+                    o.attribs.href = dist;
+                    res_suffix_map[src] = dist;
                 }
             });
 
             $("script").each(function (i, o) {
                 var src = o.attribs.src;
-                if(!/^(http:\/\/)|(https:\/\/)|(\/\/).*$/i.test(src)){
-                    if(_.existsSync("dist/"+src)){
-                        var tmp = /([^\/]{1,})\.js$/i.exec(src);
-                        var dist = src.replace(/([^\/]{1,})\.js$/i,tmp[1]+"_"+new Date().getTime()+".js");
-                        _.renameSync("dist/"+src,"dist/"+dist);
-                        o.attribs.src = dist;
+                if(src&&!/^(http:\/\/)|(https:\/\/)|(\/\/).*$/i.test(src)){
+
+                    var tmp = /([^\/]{1,})\.js$/i.exec(src);
+
+                    var dist = null;
+                    if(res_suffix_map[src]){
+                        dist = res_suffix_map[src];
+                    }else{
+                        dist = src.replace(/([^\/]{1,})\.js$/i,tmp[1]+"_"+new Date().getTime()+".js");
+                        if(_.existsSync("dist/"+src)){
+                            _.renameSync("dist/"+src,"dist/"+dist);
+                        }
                     }
+
+                    o.attribs.src = dist;
+                    res_suffix_map[src] = dist;
                 }
             });
+
+            console.log(res_suffix_map)
+            res_suffix_map = {};
         }
 
         _.writeFileSync(file,$.html());
