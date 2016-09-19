@@ -232,6 +232,7 @@ var task = function (options) {
          * 4. 开启server
          */
         var app = express();
+        var port = options.brower === true?3000:options.brower;
         var server = require('http').Server(app);
         app.get(["**/*\.html","/"],function (req, res) {
             var path = req.path;
@@ -249,12 +250,27 @@ var task = function (options) {
             res.end();
         });
         app.use(express.static('dist'));
-        server.listen(options.brower === true?3000:options.brower);
+        server.listen(port);
 
         /**
          * 打开浏览器
          */
-        _.open("http://localhost:" + port);
+        var exec = require('child_process').exec,
+            cmd;
+        switch (process.platform) {
+            case 'wind32':
+                cmd = 'start';
+                break;
+
+            case 'linux':
+                cmd = 'xdg-open';
+                break;
+
+            case 'darwin':
+                cmd = 'open';
+                break;
+        }
+        exec(cmd + " http://localhost:" + port);
     }
 
 

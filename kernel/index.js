@@ -13,6 +13,9 @@ light.commander = require('commander');
 var os = require("os");
 var pluginsDir = light.util.join(os.homedir(),".lighting-plugins");
 
+//查询有哪些插件并将插件初始化
+
+
 ['create', 'gen', 'release', 'server', 'plugin'].forEach(function (cmd) {
     var cmdDetail = require('../command/' + cmd);
     var command = light.commander
