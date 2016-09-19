@@ -35,7 +35,7 @@ Date.prototype.Format = function (fmt) { //author: meizz
 };
 
 _.log = function (level,info) {
-    info = (new Date().Format("[yyyy-MM-dd hh:mm:ss] ")+info).blue;
+    info = (new Date().Format("[yyyy-MM-dd hh:mm:ss]")+" ["+level+"] "+info).green;
     console[level].apply(this,[info]);
 };
 
