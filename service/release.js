@@ -351,10 +351,13 @@ var task = function (options) {
                         }
                         res.set('Content-Type', 'text/html');
                         var html = _.readFileSync(_.join("dist",path)).toString();
-                        html+="<script src='http://cdn.socket.io/socket.io-1.4.5.js'></script>";
-                        html+="<script>var socket = io();socket.on('reload', function (data) {console.log(data);location.reload()});</script>";
+                        html+="<script src='//cdn.bootcss.com/socket.io/1.4.8/socket.io.min.js'></script>";
+                        html+="<script>var socket = io();socket.on('reload', function (data) {console.log(data);location.reload()});window.onerror=function(err){console.log(err)}</script>";
                         io((server)).on('connection', function (socket) {
-                            sockets.push(socket);
+                            socket.id = sockets.push(socket);
+                            socket.on("disconnect",function () {
+                                delete sockets[socket.id];
+                            })
                         });
                         res.send(new Buffer(html));
                         res.end();
@@ -390,8 +393,8 @@ var task = function (options) {
                      */
                     chokidar.watch('src', {ignored: /[\/\\]\./}).on('change', function(event, path){
                         task(options);
-                        sockets.forEach(function (sockets) {
-                            sockets.emit('reload', true);
+                        sockets.forEach(function (socket) {
+                            if(socket) socket.emit('reload', true);
                         })
                     });
                 }
