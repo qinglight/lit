@@ -359,7 +359,7 @@ var task = function (options) {
                                 delete sockets[socket.id];
                             });
                             socket.on("log",function (level, msg,ua) {
-                                _.log(level,"浏览器："+msg+" ["+ua+"]");
+                                _.log(level,"浏览器："+" ["+ua+"]"+msg);
                             })
                         });
                         res.send(new Buffer(html));
