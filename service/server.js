@@ -1,8 +1,9 @@
-var light = require('../kernel'),
-	_ = light.util,
-	express = require("express");
+var express = require("express");
 
 exports.do = function(cmd,options) {
+	var light = require('../kernel'),
+		_ = light.util;
+
 	options = _.merge({
 		port:3000,
 		root:'wwwroot'
