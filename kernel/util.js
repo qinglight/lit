@@ -36,7 +36,7 @@ Date.prototype.Format = function (fmt) { //author: meizz
 
 _.log = function (level,info) {
     info = (new Date().Format("[yyyy-MM-dd hh:mm:ss]")+" ["+level+"] "+info).green;
-    console[level].apply(this,[info]);
+    console.log.apply(this,[info]);
 };
 
 lodash.extend(_,fs);

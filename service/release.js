@@ -352,11 +352,14 @@ var task = function (options) {
                         res.set('Content-Type', 'text/html');
                         var html = _.readFileSync(_.join("dist",path)).toString();
                         html+="<script src='//cdn.bootcss.com/socket.io/1.4.8/socket.io.min.js'></script>";
-                        html+="<script>var socket = io();socket.on('reload', function (data) {console.log(data);location.reload()});window.onerror=function(err){console.log(err)}</script>";
+                        html+="<script>var socket = io();if(window.Light){window.Light.Logger.websocket=socket};socket.on('reload', function (data) {console.log(data);location.reload()});window.onerror=function(err){console.log(err)}</script>";
                         io((server)).on('connection', function (socket) {
                             socket.id = sockets.push(socket);
                             socket.on("disconnect",function () {
                                 delete sockets[socket.id];
+                            });
+                            socket.on("log",function (level, msg,ua) {
+                                _.log(level,"浏览器："+msg+" ["+ua+"]");
                             })
                         });
                         res.send(new Buffer(html));
