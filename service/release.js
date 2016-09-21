@@ -368,7 +368,7 @@ var task = function (options) {
                     var exec = require('child_process').exec,
                         cmd;
                     switch (process.platform) {
-                        case 'wind32':
+                        case 'win32':
                             cmd = 'start';
                             break;
 
