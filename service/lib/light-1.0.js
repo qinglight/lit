@@ -8,11 +8,9 @@ var html = `
 var js = `
 ;(function(){
   App.defineViewModel("#<%=camel(id,'/')%>",{
-       data:{
-         data:{},
-         watch:{},
-         methods:{}
-       },
+       data:{},
+       watch:{},
+       methods:{}
      },{
      beforeRender:function () {
      }
