@@ -259,7 +259,7 @@ var task = function (options) {
                 $ = cheerio.load(content,{
                     recognizeSelfClosing:true,
                     decodeEntities: false,
-                    normalizeWhitespace: true,
+                    // normalizeWhitespace: true,
                 });
 
                 if(options.suffix){
