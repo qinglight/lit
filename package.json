@@ -1,6 +1,6 @@
 {
   "name": "lighting",
-  "version": "1.2.3-20160926",
+  "version": "1.2.3-20160928-1",
   "description": "恒生移动web应用平台（Light）快速开发集成工具箱",
   "main": "light.js",
   "dependencies": {
@@ -14,9 +14,9 @@
     "glob": "^7.0.6",
     "lodash": "^4.6.1",
     "prompt": "^1.0.0",
-    "socket.io": "^1.4.8",
     "uglify-js": "^2.7.3",
-    "useref": "^1.2.0"
+    "useref": "^1.2.0",
+    "ws": "^1.1.1"
   },
   "bin": {
     "light": "bin/light"

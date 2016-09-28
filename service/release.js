@@ -2,11 +2,15 @@ var cheerio = require("cheerio"),
     express = require("express"),
     chokidar = require('chokidar'),
     useref = require('useref'),
-    io = require('socket.io'),
+    WebSocketServer = require('ws').Server,
     UglifyJS = require('uglify-js'),
     archiver = require('archiver'),
     child_process = require('child_process'),
     os = require("os");
+
+var server = require('http').createServer()
+    , url = require('url')
+    , wss = new WebSocketServer({ server: server });
 
 var res_suffix_map = {},
     plugins = [],
@@ -337,13 +341,13 @@ var task = function (options) {
             else {
                 watch = true;
                 var sockets = [];
+
                 if(options.brower){
                     /**
                      * 4. 开启server
                      */
                     var app = express();
                     var port = options.brower === true?3000:options.brower;
-                    var server = require('http').Server(app);
                     app.get(["**/*\.html","/"],function (req, res) {
                         var path = req.path;
                         if(path=="/"){
@@ -351,21 +355,35 @@ var task = function (options) {
                         }
                         res.set('Content-Type', 'text/html');
                         var html = _.readFileSync(_.join("dist",path)).toString();
-                        html+="<script src='//cdn.bootcss.com/socket.io/1.4.8/socket.io.min.js'></script>";
-                        html+="<script>var socket = io();if(window.Light){window.Light.Logger.websocket=socket};socket.on('reload', function (data) {console.log(data);location.reload()});window.onerror=function(err){console.log(err)}</script>";
-                        io((server)).on('connection', function (socket) {
-                            socket.id = sockets.push(socket);
-                            socket.on("disconnect",function () {
-                                delete sockets[socket.id];
+                        html+=`
+                            <script>
+                                var ws = new WebSocket('ws://'+location.host);
+                                ws.onmessage = function(data, flags) {
+                                  location.reload()
+                                }
+                            </script>
+                        `;
+                        wss.on('connection', function(socket) {
+                            var id = sockets.push(socket);
+
+                            socket.on('message', function (message) {
+                                message = JSON.parse(message);
+                                if(message.type == "log"){
+                                    _.log(message.level,"浏览器："+" ["+message.userAgent+"]"+message.message);
+                                }
                             });
-                            socket.on("log",function (level, msg,ua) {
-                                _.log(level,"浏览器："+" ["+ua+"]"+msg);
-                            })
+
+                            socket.on('close', function () {
+                                delete sockets[id];
+                            });
                         });
+
                         res.send(new Buffer(html));
                         res.end();
                     });
                     app.use(express.static('dist'));
+
+                    server.on('request', app);
                     server.listen(port);
 
                     /**
@@ -397,12 +415,12 @@ var task = function (options) {
                     chokidar.watch('src', {ignored: /[\/\\]\./}).on('change', function(event, path){
                         task(options);
                         sockets.forEach(function (socket) {
-                            if(socket) socket.emit('reload', true);
+                            if(socket&&socket.readyState == 1) socket.send('reload');
                         })
                     });
                 }
             }
-            _.log("info","lighting执行完毕")
+            _.log("info","lighting执行完毕");
             resolve();
         })
     }).catch(function (err) {
