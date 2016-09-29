@@ -12,6 +12,8 @@ var server = require('http').createServer()
     , url = require('url')
     , wss = new WebSocketServer({ server: server });
 
+wss.setMaxListeners(0);
+
 var res_suffix_map = {},
     plugins = [],
     watch=false;
@@ -358,14 +360,17 @@ var task = function (options) {
                         html+=`
                             <script>
                                 var ws = new WebSocket('ws://'+location.host);
+                                if(window.Light) window.Light.Logger.websocket = ws;
                                 ws.onmessage = function(data, flags) {
-                                  location.reload()
+                                  location.reload();
                                 }
                             </script>
-                        `;
+                        `.replace(/\n/ig,"");
+
                         wss.on('connection', function(socket) {
                             var id = sockets.push(socket);
 
+                            socket.setMaxListeners(0);
                             socket.on('message', function (message) {
                                 message = JSON.parse(message);
                                 if(message.type == "log"){
