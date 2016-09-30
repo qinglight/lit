@@ -362,14 +362,15 @@ var task = function (options) {
                                 var ws = new WebSocket('ws://'+location.host);
                                 if(window.Light) window.Light.Logger.websocket = ws;
                                 ws.onmessage = function(data, flags) {
+                                  ws.close();
                                   location.reload();
                                 }
                             </script>
                         `.replace(/\n/ig,"");
 
                         wss.on('connection', function(socket) {
-                            var id = sockets.push(socket);
-
+                            if(socket.id) return;
+                            socket.id = sockets.push(socket);
                             socket.setMaxListeners(0);
                             socket.on('message', function (message) {
                                 message = JSON.parse(message);
@@ -379,7 +380,7 @@ var task = function (options) {
                             });
 
                             socket.on('close', function () {
-                                delete sockets[id];
+                                delete sockets[socket.id];
                             });
                         });
 
@@ -419,7 +420,7 @@ var task = function (options) {
                      */
                     chokidar.watch('src', {ignored: /[\/\\]\./}).on('change', function(event, path){
                         task(options);
-                        sockets.forEach(function (socket) {
+                        wss.clients.forEach(function (socket) {
                             if(socket&&socket.readyState == 1) socket.send('reload');
                         })
                     });
