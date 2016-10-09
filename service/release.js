@@ -87,6 +87,7 @@ var task = function (options) {
         options.concat = true;
     }
 
+    res_suffix_map = {};
 
     var promise = new Promise(function (resolve, reject) {
         /**
@@ -313,7 +314,7 @@ var task = function (options) {
                             res_suffix_map[src] = dist;
                         }
                     });
-                    res_suffix_map = {};
+
                 }
 
                 _.writeFileSync(file,$.html());
