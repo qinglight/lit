@@ -52,3 +52,7 @@ function main(argv){
 }
 
 module.exports.run=main;
+
+module.exports.light=function (pwd,command,options,cb) {
+	require("./service/"+command).do(null,options,cb);
+};

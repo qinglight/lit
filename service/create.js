@@ -4,7 +4,7 @@ prompt.message = "Lighting".green;
 prompt.delimiter = ":".green;
 
 
-exports.do = function (directory, options) {
+exports.do = function (directory, options,cb) {
 
     //依赖于初始化完成后的kernel
     var  _ = require('../kernel').util;
@@ -69,6 +69,10 @@ exports.do = function (directory, options) {
                     version: options.version,
                     desc: options.description
                 });
+
+
+                //**success
+                cb(123)
             });
         };
 
