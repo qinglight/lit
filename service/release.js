@@ -146,8 +146,8 @@ var task = function (options) {
 
                     //JS
                     //js要区分是否为异步视图
-                    var js = _.join("dist/js/view",attr.id+".js");
-                    if(_.existsSync(js) && !attr.async){
+                    var js = _.join("dist/js/view",attr.id+".js");//_.existsSync(js) &&
+                    if(!attr.async){
                         // 向inject:view区域添加script标签
                         injectScript.push('js/view/'+attr.id+'.js');
                     }
@@ -178,8 +178,8 @@ var task = function (options) {
 
                     //JS
                     //js要区分是否为异步视图
-                    var js = _.join("dist/js/component",attr.id+".js");
-                    if(_.existsSync(js) && !attr.async){
+                    var js = _.join("dist/js/component",attr.id+".js");//_.existsSync(js) &&
+                    if(!attr.async){
                         // 向inject:view区域添加script标签
                         injectScript.push('js/component/'+attr.id+'.js');
                     }
