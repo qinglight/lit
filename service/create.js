@@ -72,7 +72,7 @@ exports.do = function (directory, options,cb) {
 
 
                 //**success
-                cb(123)
+                if(cb) cb.call(null);
             });
         };
 

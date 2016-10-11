@@ -1,5 +1,5 @@
 {
-	"command":"release",
+	"command":"release [command]",
 	"usage":"-cuegw",
 	"description":"打包、编译、开发测试中的相关工具",
 	"option":[

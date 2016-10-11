@@ -69,8 +69,10 @@ function callPlugin(stage,cb) {
 /**
  * release命令
  * @param options
+ * @param subcommand
+ * @param cb
  */
-var task = function (options) {
+var task = function (subcommand,options,cb) {
     var light = require("../kernel"),
         _ = light.util;
 
@@ -230,7 +232,7 @@ var task = function (options) {
                         var dist_js_content = "";
                         var res = js[dist_js].assets;
                         res.forEach(function (r) {
-                            dist_js_content += _.readFileSync(_.join("dist",r)).toString()+"\n";
+                            if(_.existsSync(_.join("dist",r))) dist_js_content += _.readFileSync(_.join("dist",r)).toString()+"\n";
                         });
 
                         if(options.uglify){
@@ -247,7 +249,7 @@ var task = function (options) {
                         var dist_css_content = "";
                         var res = css[dist_css].assets;
                         res.forEach(function (r) {
-                            dist_css_content += _.readFileSync(_.join("dist",r)).toString();
+                            if(_.existsSync(_.join("dist",r))) dist_css_content += _.readFileSync(_.join("dist",r)).toString();
                         });
 
                         if(options.uglify){
@@ -331,7 +333,12 @@ var task = function (options) {
              */
             if(options.pack){
                 var project = require(process.cwd()+'/project.json');
-                zipDir("dist",project.project+"-"+project.version+".zip");
+
+                var file = project.project+"-"+project.version+".zip";
+                if(typeof options.pack == "string"){
+                    file = options.pack+"/"+file;
+                }
+                zipDir("dist",file);
             }
 
             callPlugin("packager",function () {
@@ -414,21 +421,30 @@ var task = function (options) {
                     exec(cmd + " http://localhost:" + port);
                 }
 
-
+                var watcher = null;
                 if(options.watch){
                     /**
                      * 5. 开启watch
                      */
-                    chokidar.watch('src', {ignored: /[\/\\]\./}).on('change', function(event, path){
-                        task(options);
+                    watcher = chokidar.watch('src', {ignored: /[\/\\]\./}).on('change', function(event, path){
+                        task(subcommand,options);
                         wss.clients.forEach(function (socket) {
                             if(socket&&socket.readyState == 1) socket.send('reload');
                         })
                     });
                 }
+
+                //**cb
+                if(cb) cb.call(null,{
+                    close:function () {
+                        if(watcher) watcher.close();
+                        watch = false;
+                    }
+                });
+
+                resolve();
             }
             _.log("info","lighting执行完毕");
-            resolve();
         })
     }).catch(function (err) {
         _.log("error",err);

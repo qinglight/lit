@@ -54,5 +54,14 @@ function main(argv){
 module.exports.run=main;
 
 module.exports.light=function (pwd,command,options,cb) {
-	require("./service/"+command).do(null,options,cb);
+	var cwd = process.cwd();
+	process.chdir(pwd);
+	require("./service/"+command).do(null,options,function () {
+		process.chdir(cwd);
+		cb.apply(null,arguments);
+	});
+};
+
+module.exports.light.log = function (cb) {
+	light.util.log = cb;
 };

@@ -1,6 +1,6 @@
 var express = require("express");
 
-exports.do = function(cmd,options) {
+exports.do = function(cmd,options,cb) {
 	var light = require('../kernel'),
 		_ = light.util;
 
@@ -11,7 +11,10 @@ exports.do = function(cmd,options) {
 
 	var app = express();
 	app.use(express.static(options.root));
-	app.listen(options.port,function () {
-		_.log("info","HTTP服务器正常启动")
+	var http = require('http').Server(app);
+	http.listen(options.port,function () {
+		_.log("info","HTTP服务器正常启动");
+
+		if(cb) cb.call(null,http);
 	});
 };
