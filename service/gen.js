@@ -3,7 +3,7 @@
  * @param cmd
  * @param options
  */
-exports.do = function (cmd, options) {
+exports.do = function (cmd, options,cb) {
     var _ = require('../kernel').util,
         cheerio = require('cheerio'),
         project;
@@ -16,55 +16,55 @@ exports.do = function (cmd, options) {
         process.exit(-1);
     }
 
-    _.glob("src/html/page/*.html", function (err, result) {
-        _.forEach(result, function (page) {
-            var $ = cheerio.load(_.readFileSync(page), {
-                recognizeSelfClosing: true
-            });
+    var result = _.glob.sync("src/html/page/*.html");
+    _.forEach(result, function (page) {
+        var $ = cheerio.load(_.readFileSync(page), {
+            recognizeSelfClosing: true
+        });
 
-            //每个页面都要生成视图和register文件
-            var template = require("./lib/"+(project.type||"light-0.1"));
+        //每个页面都要生成视图和register文件
+        var template = require("./lib/"+(project.type||"light-0.1"));
 
-            var views = $("view"),
-                components = $("component"),
-                register = "src/js/regist/" + _.parse(page).name + ".js";
+        var views = $("view"),
+            components = $("component"),
+            register = "src/js/regist/" + _.parse(page).name + ".js";
 
-            //每一次gen都要重新生成register文件
-            if(_.existsSync(register)) _.removeSync(register);
+        //每一次gen都要重新生成register文件
+        if(_.existsSync(register)) _.removeSync(register);
 
-            _.forEach(views, function (view) {
-                var attrs = _.merge({
-                    async: false,
-                    home: false,
-                    parent:null
-                }, view.attribs);
+        _.forEach(views, function (view) {
+            var attrs = _.merge({
+                async: false,
+                home: false,
+                parent:null
+            }, view.attribs);
 
-                var html = "src/html/view/" + attrs.id + ".html";
-                var js = "src/js/view/" + attrs.id + ".js";
+            var html = "src/html/view/" + attrs.id + ".html";
+            var js = "src/js/view/" + attrs.id + ".js";
 
-                if (!_.existsSync(html) || options.override) {
-                    _.outputFileSync(html, template.html(attrs));
-                    _.log("info","生成视图(html):" + attrs.id);
-                } else {
-                    _.log("info","视图(html)" + attrs.id + "已经存在,跳过代码生成,如需要强制覆盖,请添加-o选项");
-                }
+            if (!_.existsSync(html) || options.override) {
+                _.outputFileSync(html, template.html(attrs));
+                _.log("info","生成视图(html):" + attrs.id);
+            } else {
+                _.log("info","视图(html)" + attrs.id + "已经存在,跳过代码生成,如需要强制覆盖,请添加-o选项");
+            }
 
-                if (!_.existsSync(js) || options.override) {
-                    _.outputFileSync(js, template.js(attrs));
-                    _.log("info","生成视图(js):" + attrs.id);
-                } else {
-                    _.log("info","视图(js)" + attrs.id + "已经存在,跳过代码生成,如需要强制覆盖,请添加-o选项");
-                }
+            if (!_.existsSync(js) || options.override) {
+                _.outputFileSync(js, template.js(attrs));
+                _.log("info","生成视图(js):" + attrs.id);
+            } else {
+                _.log("info","视图(js)" + attrs.id + "已经存在,跳过代码生成,如需要强制覆盖,请添加-o选项");
+            }
 
-                //追加register信息
-                if(!_.existsSync(register)) {
-                    _.outputFileSync(register, template.register(attrs));
-                }else{
-                    _.outputFileSync(register, template.register(attrs),{
-                        flag:"a"
-                    });
-                }
-            });
-        })
+            //追加register信息
+            if(!_.existsSync(register)) {
+                _.outputFileSync(register, template.register(attrs));
+            }else{
+                _.outputFileSync(register, template.register(attrs),{
+                    flag:"a"
+                });
+            }
+        });
     });
+    if(cb) cb.call(null);
 };
